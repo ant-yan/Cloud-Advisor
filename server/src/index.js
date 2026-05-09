@@ -17,7 +17,7 @@ app.use(helmet());
 // Trust proxy headers (needed for correct IP detection behind Render/Railway/Vercel)
 app.set('trust proxy', 1);
 
-app.use(cors({ origin: process.env.CLIENT_ORIGIN || 'http://localhost:5173' }));
+app.use(cors({ origin: process.env.CLIENT_URL || 'http://localhost:5173' }));
 
 // Limit body size — 32 KB is more than enough for any legitimate request
 app.use(express.json({ limit: '32kb' }));
