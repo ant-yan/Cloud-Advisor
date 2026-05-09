@@ -1,0 +1,108 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+  }
+
+  * {
+    @apply border-slate-200 dark:border-slate-800;
+  }
+
+  body {
+    @apply bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-50 antialiased;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight;
+  }
+}
+
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@layer base {
+  /* Global keyboard focus ring — only shows for keyboard navigation, not mouse clicks */
+  :focus-visible {
+    @apply outline-none ring-2 ring-primary-500 ring-offset-2 ring-offset-white dark:ring-offset-slate-950;
+  }
+
+  /* Remove default outline since we replace it with ring */
+  button:focus, a:focus, input:focus, select:focus, textarea:focus {
+    outline: none;
+  }
+}
+
+/* ─── Print / PDF stylesheet ───────────────────────────────────────────────
+   Used by the "Download PDF" button via window.print().
+   Hides chrome, forces light background, and lays out results cleanly.
+   ─────────────────────────────────────────────────────────────────────── */
+@media print {
+  /* Force light mode regardless of OS/app preference */
+  :root { color-scheme: light; }
+  body {
+    background: white !important;
+    color: black !important;
+    font-size: 12pt;
+    line-height: 1.5;
+  }
+
+  /* Hide everything that isn't the results content */
+  header,
+  footer,
+  nav,
+  [data-print-hide],
+  .fixed {
+    display: none !important;
+  }
+
+  /* Ensure results container fills the page */
+  [data-print-content] {
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+
+  /* Cards: remove shadows, keep borders */
+  .shadow-card,
+  .shadow-card-hover {
+    box-shadow: none !important;
+    border: 1px solid #e2e8f0 !important;
+  }
+
+  /* Score bars: browsers strip backgrounds by default; force them */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Avoid breaking a card across a page */
+  .rounded-card {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* Provider header color strip */
+  [data-provider-bar] {
+    -webkit-print-color-adjust: exact !important;
+  }
+
+  a { text-decoration: none; color: inherit; }
+}

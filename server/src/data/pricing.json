@@ -1,0 +1,208 @@
+{
+  "providers": {
+    "aws": {
+      "name": "AWS",
+      "compute": {
+        "pricePerHour": 0.0232,
+        "description": "t3.small EC2 (2 vCPU, 2 GB) — us-east-1 on-demand"
+      },
+      "storage": {
+        "pricePerGbMonth": 0.023,
+        "description": "S3 Standard"
+      },
+      "bandwidth": {
+        "pricePerGb": 0.09,
+        "description": "Data transfer out to internet (after 10 GB free)"
+      },
+      "database": {
+        "pricePerInstanceMonth": 15.33,
+        "description": "RDS db.t3.micro Single-AZ (MySQL/PostgreSQL) — us-east-1"
+      },
+      "freeTier": {
+        "computeHours": 750,
+        "storageGb": 5,
+        "bandwidthGb": 1,
+        "databaseInstances": 1
+      }
+    },
+    "gcp": {
+      "name": "GCP",
+      "compute": {
+        "pricePerHour": 0.01675,
+        "description": "e2-small (2 vCPU shared, 2 GB) — us-central1"
+      },
+      "storage": {
+        "pricePerGbMonth": 0.020,
+        "description": "Cloud Storage Standard"
+      },
+      "bandwidth": {
+        "pricePerGb": 0.08,
+        "description": "Egress to internet (Americas/EMEA)"
+      },
+      "database": {
+        "pricePerInstanceMonth": 9.37,
+        "description": "Cloud SQL db-f1-micro (shared, 0.6 GB) — us-central1"
+      },
+      "freeTier": {
+        "computeHours": 744,
+        "storageGb": 5,
+        "bandwidthGb": 1,
+        "databaseInstances": 0
+      }
+    },
+    "azure": {
+      "name": "Azure",
+      "compute": {
+        "pricePerHour": 0.0207,
+        "description": "B1ms VM (1 vCPU, 2 GB) — East US"
+      },
+      "storage": {
+        "pricePerGbMonth": 0.018,
+        "description": "Blob Storage LRS (Hot tier)"
+      },
+      "bandwidth": {
+        "pricePerGb": 0.087,
+        "description": "Outbound data transfer (after 5 GB free)"
+      },
+      "database": {
+        "pricePerInstanceMonth": 12.41,
+        "description": "Azure DB for PostgreSQL Flexible — Burstable B1ms"
+      },
+      "freeTier": {
+        "computeHours": 750,
+        "storageGb": 5,
+        "bandwidthGb": 5,
+        "databaseInstances": 0
+      }
+    },
+    "digitalocean": {
+      "name": "DigitalOcean",
+      "compute": {
+        "pricePerHour": 0.00893,
+        "description": "Basic Droplet (1 vCPU, 1 GB RAM) — $6.50/mo"
+      },
+      "storage": {
+        "pricePerGbMonth": 0.020,
+        "description": "Spaces Object Storage (after 250 GB free with $5/mo plan)"
+      },
+      "bandwidth": {
+        "pricePerGb": 0.01,
+        "description": "Bandwidth overage (1 TB free/mo per Droplet)"
+      },
+      "database": {
+        "pricePerInstanceMonth": 15.00,
+        "description": "Managed PostgreSQL — Basic (1 GB RAM, 1 vCPU)"
+      },
+      "freeTier": {
+        "computeHours": 0,
+        "storageGb": 0,
+        "bandwidthGb": 1024,
+        "databaseInstances": 0
+      }
+    },
+    "vercel": {
+      "name": "Vercel",
+      "compute": {
+        "pricePerHour": 0.0,
+        "description": "Serverless Functions — included in Pro plan ($20/mo base)"
+      },
+      "storage": {
+        "pricePerGbMonth": 0.023,
+        "description": "Vercel Blob (after 1 GB free on Hobby)"
+      },
+      "bandwidth": {
+        "pricePerGb": 0.15,
+        "description": "Bandwidth overage (100 GB free on Pro)"
+      },
+      "database": {
+        "pricePerInstanceMonth": 0.0,
+        "description": "External DB required (Supabase, PlanetScale, Neon)"
+      },
+      "freeTier": {
+        "computeHours": 9999,
+        "storageGb": 1,
+        "bandwidthGb": 100,
+        "databaseInstances": 0
+      },
+      "notes": "Vercel is a frontend/edge platform. Compute is serverless and included in Pro ($20/mo). Database services require third-party providers."
+    },
+    "netlify": {
+      "name": "Netlify",
+      "compute": {
+        "pricePerHour": 0.0,
+        "description": "Edge Functions — included in Starter (free) and Pro ($19/mo) plans"
+      },
+      "storage": {
+        "pricePerGbMonth": 0.023,
+        "description": "Netlify Blobs object storage (after 1 GB free)"
+      },
+      "bandwidth": {
+        "pricePerGb": 0.20,
+        "description": "Bandwidth overage at $0.20/GB after 100 GB free (Starter plan)"
+      },
+      "database": {
+        "pricePerInstanceMonth": 0.0,
+        "description": "No native database — integrates with Supabase, PlanetScale, or Neon"
+      },
+      "freeTier": {
+        "computeHours": 0,
+        "storageGb": 1,
+        "bandwidthGb": 100,
+        "databaseInstances": 0
+      },
+      "notes": "Netlify is a frontend/edge platform. Compute (Edge Functions) is event-driven and not hour-based. Database requires a third-party provider."
+    },
+    "render": {
+      "name": "Render",
+      "compute": {
+        "pricePerHour": 0.00694,
+        "description": "Starter web service (512 MB RAM, 0.5 CPU) — $5/mo always-on"
+      },
+      "storage": {
+        "pricePerGbMonth": 0.25,
+        "description": "Render Disks persistent block storage"
+      },
+      "bandwidth": {
+        "pricePerGb": 0.10,
+        "description": "Outbound bandwidth overage after 100 GB free/month"
+      },
+      "database": {
+        "pricePerInstanceMonth": 7.00,
+        "description": "Managed PostgreSQL Starter (256 MB RAM, 1 GB storage)"
+      },
+      "freeTier": {
+        "computeHours": 750,
+        "storageGb": 0,
+        "bandwidthGb": 100,
+        "databaseInstances": 0
+      },
+      "notes": "Free tier web services spin down after 15 minutes of inactivity and resume on the next request (with a cold-start delay). Managed databases are free for 90 days, then $7/month."
+    },
+    "cloudflare": {
+      "name": "Cloudflare",
+      "compute": {
+        "pricePerHour": 0.0,
+        "description": "Workers — 100K requests/day free; Workers Paid $5/mo for 10M requests"
+      },
+      "storage": {
+        "pricePerGbMonth": 0.015,
+        "description": "R2 Object Storage after 10 GB free — cheapest among all providers"
+      },
+      "bandwidth": {
+        "pricePerGb": 0.0,
+        "description": "Zero egress fees from R2 — no data transfer charges"
+      },
+      "database": {
+        "pricePerInstanceMonth": 0.0,
+        "description": "D1 SQLite database — 5 GB free, then $0.001/GB/month"
+      },
+      "freeTier": {
+        "computeHours": 0,
+        "storageGb": 10,
+        "bandwidthGb": 0,
+        "databaseInstances": 1
+      },
+      "notes": "Cloudflare charges zero egress fees on R2 storage — a significant cost advantage over AWS S3, GCP Cloud Storage, and Azure Blob. Compute (Workers) is event-driven with no hourly pricing."
+    }
+  }
+}

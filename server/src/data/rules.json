@@ -1,0 +1,72 @@
+{
+  "weights": {
+    "useCase": 0.30,
+    "budget": 0.25,
+    "easeOfUse": 0.20,
+    "geography": 0.15,
+    "services": 0.10
+  },
+  "useCaseMap": {
+    "website": "website",
+    "webapp": "webapp",
+    "mobile": "mobile",
+    "storage": "storage",
+    "ml": "ml",
+    "other": "other"
+  },
+  "budgetMap": {
+    "free": "free",
+    "under50": "under50",
+    "50-200": "50-200",
+    "200-1000": "200-1000",
+    "1000+": "1000+"
+  },
+  "geographyMap": {
+    "single": "single",
+    "multiple": "multiple",
+    "global": "global",
+    "specific": "specific"
+  },
+  "servicesList": [
+    "database",
+    "nosql",
+    "storage",
+    "cdn",
+    "auth",
+    "serverless",
+    "containers",
+    "ml",
+    "email"
+  ],
+  "priorityBoosts": {
+    "cost": {
+      "budgetWeightMultiplier": 1.3
+    },
+    "ease": {
+      "easeWeightMultiplier": 1.3
+    },
+    "scalability": {
+      "useCaseWeightMultiplier": 1.2
+    },
+    "compliance": {
+      "providers": {
+        "azure": 1.15,
+        "aws": 1.10
+      }
+    },
+    "support": {
+      "providers": {
+        "aws": 1.10,
+        "azure": 1.10,
+        "gcp": 1.05
+      }
+    },
+    "performance": {
+      "providers": {
+        "aws": 1.08,
+        "gcp": 1.10,
+        "vercel": 1.12
+      }
+    }
+  }
+}
