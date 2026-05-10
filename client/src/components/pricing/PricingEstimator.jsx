@@ -99,7 +99,7 @@ export default function PricingEstimator() {
             }
           />
           <p className="text-xs text-slate-400 dark:text-slate-500 leading-relaxed">
-            ⚡ For Vercel, Netlify, and Cloudflare, hours are converted to estimated function invocations (1 hr ≈ 72,000 requests at 50 ms avg).
+            ⚡ For Vercel, Netlify, and Cloudflare, hours are converted to estimated function invocations (1 hr ≈ 5,000 requests — realistic average for typical web apps).
           </p>
         </div>
         <PricingSlider

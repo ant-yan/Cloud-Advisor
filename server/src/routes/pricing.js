@@ -3,8 +3,9 @@ const express = require('express');
 const router = express.Router();
 const pricingData = require('../data/pricing.json');
 
-// Serverless conversion: 1 hr = 3,600,000 ms; at 50 ms avg per request = 72,000 req/hr
-const REQUESTS_PER_COMPUTE_HOUR = 72000;
+// Serverless conversion: realistic average of ~5,000 requests/hr for typical web apps
+// (100% CPU-saturation at 50ms/req = 72,000/hr is unrealistic; 5,000/hr is a practical baseline)
+const REQUESTS_PER_COMPUTE_HOUR = 5000;
 
 function calcProviderCost(providerPricing, resources) {
   const { computeHours = 0, storageGb = 0, bandwidthGb = 0, databaseInstances = 0 } = resources;
@@ -20,7 +21,7 @@ function calcProviderCost(providerPricing, resources) {
     computeCost = billableInvocations * providerPricing.compute.pricePerInvocation;
     serverlessNote =
       `Serverless platform: ${estimatedInvocations.toLocaleString()} estimated invocations ` +
-      `(${computeHours} hr × ${REQUESTS_PER_COMPUTE_HOUR.toLocaleString()} req/hr at 50 ms avg). ` +
+      `(${computeHours} hr × ${REQUESTS_PER_COMPUTE_HOUR.toLocaleString()} req/hr typical average). ` +
       `Pricing is based on function invocations and bandwidth, not server hours.`;
   } else {
     const billableCompute = Math.max(0, computeHours - ft.computeHours);
@@ -48,6 +49,9 @@ function calcProviderCost(providerPricing, resources) {
   };
 
   if (serverlessNote) result.serverless_note = serverlessNote;
+
+  const dbNote = providerPricing.database.note;
+  if (dbNote && databaseInstances > 0) result.database_note = dbNote;
 
   return result;
 }
