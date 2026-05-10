@@ -32,7 +32,7 @@ export default function OnboardingBanner() {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 16, scale: 0.97 }}
           transition={{ duration: 0.3, ease: 'easeOut' }}
-          className="fixed bottom-[4.5rem] sm:bottom-5 left-1/2 -translate-x-1/2 sm:left-5 sm:translate-x-0 sm:right-auto z-50 w-[calc(100vw-2.5rem)] sm:w-auto max-w-sm"
+          className="fixed bottom-5 left-4 right-[5rem] sm:left-5 sm:right-auto sm:w-auto z-50 max-w-sm"
         >
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl shadow-slate-900/10 dark:shadow-black/40 p-4">
             <div className="flex items-start gap-3">
