@@ -7,17 +7,16 @@ const BRAND_COLORS = {
   gcp:          '#4285F4',
   azure:        '#0078D4',
   digitalocean: '#0080FF',
-  vercel:       '#111827',
+  vercel:       '#525252',
   netlify:      '#00AD9F',
   render:       '#7C3AED',
   cloudflare:   '#F6821F',
 };
 
-const COMPUTE_NOTES = {
-  vercel:     "Compute shown as $0 — serverless functions are bundled in Vercel's Pro plan ($20/mo base, not included above).",
-  netlify:    "Compute shown as $0 — Edge Functions are included in Netlify's Starter (free) and Pro ($19/mo) plans.",
-  cloudflare: "Compute shown as $0 — Workers are request-driven (100K req/day free; $5/mo for 10M requests on the paid plan).",
-};
+const SERVERLESS_PROVIDERS = new Set(['vercel', 'netlify', 'cloudflare']);
+
+// AWS and Azure free tiers are trial-only (12 months), not permanent
+const TIME_LIMITED_FREE_TIER = new Set(['aws', 'azure']);
 
 const BANDWIDTH_NOTES = {
   cloudflare: "Zero egress fees from R2 — no data transfer charges. A major cost advantage over AWS, GCP, and Azure.",
@@ -45,10 +44,15 @@ function ProviderRow({ est, isCheapest, maxCost, index }) {
   const [open, setOpen] = useState(false);
   const pct = (est.monthly_usd / maxCost) * 100;
   const color = BRAND_COLORS[est.provider] || '#6366f1';
-  const computeNote = est.breakdown.compute === 0 ? COMPUTE_NOTES[est.provider] : null;
+  const isServerless = SERVERLESS_PROVIDERS.has(est.provider);
+  const isWithinFreeTier = est.monthly_usd === 0;
+  const hasTimeLimitedFree = TIME_LIMITED_FREE_TIER.has(est.provider);
+  const serverlessNote = est.serverless_note || null;
   const bandwidthNote = BANDWIDTH_NOTES[est.provider];
   const tierNote = TIER_NOTES[est.provider];
-  const hasDetails = computeNote || bandwidthNote || tierNote || Object.values(est.breakdown).some((v) => v > 0);
+  const hasDetails =
+    isWithinFreeTier || serverlessNote || bandwidthNote || tierNote ||
+    Object.values(est.breakdown).some((v) => v > 0);
 
   return (
     <div className="rounded-xl border border-slate-100 dark:border-slate-800 overflow-hidden">
@@ -60,15 +64,24 @@ function ProviderRow({ est, isCheapest, maxCost, index }) {
         className={`w-full text-left px-4 py-3 bg-white dark:bg-slate-900 transition-colors ${hasDetails ? 'hover:bg-slate-50 dark:hover:bg-slate-800/60 cursor-pointer' : 'cursor-default'}`}
       >
         <div className="flex items-center justify-between mb-2.5">
-          <div className="flex items-center gap-2.5 min-w-0">
+          {/* Left: dot + name + badges */}
+          <div className="flex items-center gap-2 min-w-0">
             <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
             <span className="text-sm font-semibold text-slate-800 dark:text-slate-200 truncate">{est.name}</span>
+            {isServerless && (
+              <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300 flex-shrink-0 leading-tight whitespace-nowrap">
+                <span className="hidden sm:inline">Serverless · invocation based</span>
+                <span className="sm:hidden">Serverless</span>
+              </span>
+            )}
             {isCheapest && (
               <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 flex-shrink-0">
                 Best value
               </span>
             )}
           </div>
+
+          {/* Right: price + chevron */}
           <div className="flex items-center gap-2 flex-shrink-0 ml-3">
             <span className="text-sm font-bold text-slate-900 dark:text-white tabular-nums">
               ${est.monthly_usd.toFixed(2)}
@@ -78,7 +91,7 @@ function ProviderRow({ est, isCheapest, maxCost, index }) {
           </div>
         </div>
 
-        {/* Animated bar */}
+        {/* Animated cost bar */}
         <div className="h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
           <motion.div
             className="h-full rounded-full"
@@ -102,7 +115,7 @@ function ProviderRow({ est, isCheapest, maxCost, index }) {
             className="overflow-hidden"
           >
             <div className="px-4 pb-4 pt-1 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800">
-              {/* Cost breakdown */}
+              {/* Cost breakdown by dimension */}
               <div className="flex flex-wrap gap-x-4 gap-y-1 mb-2">
                 {Object.entries(est.breakdown).map(([k, v]) =>
                   v > 0 ? (
@@ -118,9 +131,15 @@ function ProviderRow({ est, isCheapest, maxCost, index }) {
 
               {/* Contextual notes */}
               <div className="space-y-1">
-                {computeNote && (
+                {isWithinFreeTier && (
+                  <p className="text-xs text-emerald-600 dark:text-emerald-400 leading-relaxed">
+                    ✓ Current usage falls within the free tier.
+                    {hasTimeLimitedFree && ' Free tier is valid for the first 12 months only — standard rates apply after.'}
+                  </p>
+                )}
+                {serverlessNote && (
                   <p className="text-xs text-amber-600 dark:text-amber-400 leading-relaxed">
-                    ⚡ {computeNote}
+                    ⚡ {serverlessNote}
                   </p>
                 )}
                 {bandwidthNote && (
@@ -134,6 +153,7 @@ function ProviderRow({ est, isCheapest, maxCost, index }) {
                   </p>
                 )}
               </div>
+
               <Link
                 to={`/providers/${est.provider}`}
                 className="inline-flex items-center gap-1 mt-2 text-xs font-medium text-primary-600 dark:text-primary-400 hover:underline"

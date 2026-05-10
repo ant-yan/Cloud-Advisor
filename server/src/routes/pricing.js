@@ -1,24 +1,43 @@
+// Rates verified: May 2026 — check provider pricing pages for updates
 const express = require('express');
 const router = express.Router();
 const pricingData = require('../data/pricing.json');
+
+// Serverless conversion: 1 hr = 3,600,000 ms; at 50 ms avg per request = 72,000 req/hr
+const REQUESTS_PER_COMPUTE_HOUR = 72000;
 
 function calcProviderCost(providerPricing, resources) {
   const { computeHours = 0, storageGb = 0, bandwidthGb = 0, databaseInstances = 0 } = resources;
   const ft = providerPricing.freeTier;
 
-  const billableCompute = Math.max(0, computeHours - ft.computeHours);
+  let computeCost = 0;
+  let serverlessNote = null;
+
+  if (providerPricing.serverless) {
+    // Convert compute hours to estimated function invocations
+    const estimatedInvocations = Math.round(computeHours * REQUESTS_PER_COMPUTE_HOUR);
+    const billableInvocations = Math.max(0, estimatedInvocations - ft.freeInvocations);
+    computeCost = billableInvocations * providerPricing.compute.pricePerInvocation;
+    serverlessNote =
+      `Serverless platform: ${estimatedInvocations.toLocaleString()} estimated invocations ` +
+      `(${computeHours} hr × ${REQUESTS_PER_COMPUTE_HOUR.toLocaleString()} req/hr at 50 ms avg). ` +
+      `Pricing is based on function invocations and bandwidth, not server hours.`;
+  } else {
+    const billableCompute = Math.max(0, computeHours - ft.computeHours);
+    computeCost = billableCompute * providerPricing.compute.pricePerHour;
+  }
+
   const billableStorage = Math.max(0, storageGb - ft.storageGb);
   const billableBandwidth = Math.max(0, bandwidthGb - ft.bandwidthGb);
   const billableDb = Math.max(0, databaseInstances - ft.databaseInstances);
 
-  const computeCost = billableCompute * providerPricing.compute.pricePerHour;
   const storageCost = billableStorage * providerPricing.storage.pricePerGbMonth;
   const bandwidthCost = billableBandwidth * providerPricing.bandwidth.pricePerGb;
   const dbCost = billableDb * providerPricing.database.pricePerInstanceMonth;
 
   const total = computeCost + storageCost + bandwidthCost + dbCost;
 
-  return {
+  const result = {
     monthly_usd: Math.round(total * 100) / 100,
     breakdown: {
       compute: Math.round(computeCost * 100) / 100,
@@ -27,6 +46,10 @@ function calcProviderCost(providerPricing, resources) {
       database: Math.round(dbCost * 100) / 100,
     },
   };
+
+  if (serverlessNote) result.serverless_note = serverlessNote;
+
+  return result;
 }
 
 router.post('/', (req, res) => {

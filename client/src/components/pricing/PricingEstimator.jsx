@@ -7,7 +7,7 @@ import LoadingSpinner from '../ui/LoadingSpinner';
 
 function downloadCSV(estimates, resources) {
   const breakdownKeys = [...new Set(estimates.flatMap((e) => Object.keys(e.breakdown)))];
-  const header = ['Provider', 'Monthly (USD)', ...breakdownKeys.map((k) => k.charAt(0).toUpperCase() + k.slice(1))];
+  const header = ['Provider', 'Monthly (USD)', ...breakdownKeys.map((k) => k.charAt(0).toUpperCase() + k.slice(1)), 'Notes'];
   const rows = estimates
     .slice()
     .sort((a, b) => a.monthly_usd - b.monthly_usd)
@@ -15,6 +15,7 @@ function downloadCSV(estimates, resources) {
       e.name,
       e.monthly_usd.toFixed(2),
       ...breakdownKeys.map((k) => (e.breakdown[k] ?? 0).toFixed(2)),
+      e.serverless_note ? `"${e.serverless_note.replace(/"/g, '""')}"` : '',
     ]);
   const meta = [
     [],
@@ -80,22 +81,27 @@ export default function PricingEstimator() {
       <div className="bg-white dark:bg-slate-900 rounded-card border border-slate-200 dark:border-slate-700 p-6 shadow-card space-y-7">
         <h2 className="text-base font-semibold text-slate-900 dark:text-white">Configure your usage</h2>
 
-        <PricingSlider
-          label="Compute"
-          sublabel="instance hours / month"
-          value={resources.computeHours}
-          min={0}
-          max={2160}
-          unit="hrs"
-          onChange={(v) => setResource('computeHours', v)}
-          hint={
-            resources.computeHours === 0
-              ? 'No compute — good for static sites or serverless-only.'
-              : resources.computeHours <= 720
-              ? `${resources.computeHours} hrs = ${(resources.computeHours / 720 * 100).toFixed(0)}% of one server running 24/7 for a month.`
-              : `${resources.computeHours} hrs = ${(resources.computeHours / 720).toFixed(1)}× the cost of one always-on server.`
-          }
-        />
+        <div className="space-y-1.5">
+          <PricingSlider
+            label="Compute"
+            sublabel="instance hours / month"
+            value={resources.computeHours}
+            min={0}
+            max={2160}
+            unit="hrs"
+            onChange={(v) => setResource('computeHours', v)}
+            hint={
+              resources.computeHours === 0
+                ? 'No compute — good for static sites or serverless-only.'
+                : resources.computeHours <= 720
+                ? `${resources.computeHours} hrs = ${(resources.computeHours / 720 * 100).toFixed(0)}% of one server running 24/7 for a month.`
+                : `${resources.computeHours} hrs = ${(resources.computeHours / 720).toFixed(1)}× the cost of one always-on server.`
+            }
+          />
+          <p className="text-xs text-slate-400 dark:text-slate-500 leading-relaxed">
+            ⚡ For Vercel, Netlify, and Cloudflare, hours are converted to estimated function invocations (1 hr ≈ 72,000 requests at 50 ms avg).
+          </p>
+        </div>
         <PricingSlider
           label="Storage"
           sublabel="GB stored"

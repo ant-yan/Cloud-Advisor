@@ -59,7 +59,7 @@ export const PROVIDERS = [
     id: 'vercel',
     name: 'Vercel',
     fullName: 'Vercel',
-    brandColor: '#000000',
+    brandColor: '#525252',
     website: 'https://vercel.com',
     description: 'The platform built for frontend developers. Deploy Next.js, React, and static sites instantly with zero configuration.',
     easeOfUse: 10,
