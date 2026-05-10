@@ -158,7 +158,7 @@
       "freeTier": {
         "freeInvocations": 125000,
         "storageGb": 1,
-        "bandwidthGb": 100,
+        "bandwidthGb": 1000,
         "databaseInstances": 0
       },
       "notes": "Netlify is a serverless/edge platform — compute is invocation-based, not hour-based. 1 compute hour is modeled as ~72,000 invocations (50 ms avg execution). Database requires a third-party provider."
@@ -187,7 +187,7 @@
       "freeTier": {
         "freeInvocations": 6000000,
         "storageGb": 1,
-        "bandwidthGb": 100,
+        "bandwidthGb": 1000,
         "databaseInstances": 0
       },
       "notes": "Vercel is a serverless/edge platform — compute is invocation-based, not hour-based. 1 compute hour is modeled as ~72,000 invocations (50 ms avg execution). Database services require third-party providers."
