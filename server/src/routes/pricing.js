@@ -33,8 +33,12 @@ function calcProviderCost(providerPricing, resources) {
   const billableDb = Math.max(0, databaseInstances - ft.databaseInstances);
 
   const storageCost = billableStorage * providerPricing.storage.pricePerGbMonth;
-  const bandwidthCost = billableBandwidth * providerPricing.bandwidth.pricePerGb;
+  let bandwidthCost = billableBandwidth * providerPricing.bandwidth.pricePerGb;
   const dbCost = billableDb * providerPricing.database.pricePerInstanceMonth;
+
+  const bwCap = providerPricing.bandwidth.maxMonthlyCost;
+  const bandwidthCapped = bwCap !== undefined && bandwidthCost > bwCap;
+  if (bandwidthCapped) bandwidthCost = bwCap;
 
   const total = computeCost + storageCost + bandwidthCost + dbCost;
 
@@ -49,6 +53,7 @@ function calcProviderCost(providerPricing, resources) {
   };
 
   if (serverlessNote) result.serverless_note = serverlessNote;
+  if (bandwidthCapped) result.bandwidth_cap_note = 'High bandwidth usage — consider a CDN or traditional cloud provider for workloads above 100 GB/mo';
 
   const dbNote = providerPricing.database.note;
   if (dbNote && databaseInstances > 0) result.database_note = dbNote;

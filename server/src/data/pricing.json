@@ -147,7 +147,8 @@
       },
       "bandwidth": {
         "pricePerGb": 0.55,
-        "description": "Bandwidth overage at $0.55/GB after 100 GB free/month"
+        "maxMonthlyCost": 50,
+        "description": "Bandwidth overage at $0.55/GB after 100 GB free/month (capped at $50/mo)"
       },
       "database": {
         "pricePerInstanceMonth": 0.0,
@@ -175,7 +176,8 @@
       },
       "bandwidth": {
         "pricePerGb": 0.40,
-        "description": "Bandwidth overage at $0.40/GB after 100 GB free"
+        "maxMonthlyCost": 50,
+        "description": "Bandwidth overage at $0.40/GB after 100 GB free (capped at $50/mo)"
       },
       "database": {
         "pricePerInstanceMonth": 0.0,

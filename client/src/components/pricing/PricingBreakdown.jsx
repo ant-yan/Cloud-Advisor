@@ -49,10 +49,11 @@ function ProviderRow({ est, isCheapest, maxCost, index }) {
   const hasTimeLimitedFree = TIME_LIMITED_FREE_TIER.has(est.provider);
   const serverlessNote = est.serverless_note || null;
   const databaseNote = est.database_note || null;
+  const bandwidthCapNote = est.bandwidth_cap_note || null;
   const bandwidthNote = BANDWIDTH_NOTES[est.provider];
   const tierNote = TIER_NOTES[est.provider];
   const hasDetails =
-    isWithinFreeTier || serverlessNote || databaseNote || bandwidthNote || tierNote ||
+    isWithinFreeTier || serverlessNote || databaseNote || bandwidthCapNote || bandwidthNote || tierNote ||
     Object.values(est.breakdown).some((v) => v > 0);
 
   return (
@@ -151,6 +152,11 @@ function ProviderRow({ est, isCheapest, maxCost, index }) {
                 {databaseNote && (
                   <p className="text-xs text-blue-600 dark:text-blue-400 leading-relaxed">
                     🗄 {databaseNote}
+                  </p>
+                )}
+                {bandwidthCapNote && (
+                  <p className="text-xs text-orange-600 dark:text-orange-400 leading-relaxed">
+                    ⚠ Bandwidth capped at $50/mo. {bandwidthCapNote}
                   </p>
                 )}
                 {bandwidthNote && (
