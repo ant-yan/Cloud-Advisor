@@ -2,8 +2,10 @@ import { useState, useCallback, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronLeft, RotateCcw, AlertTriangle, AlertCircle } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAdvisor } from '../../context/AdvisorContext';
 import { getRecommendation } from '../../lib/api';
+import i18n from '../../i18n';
 import WizardProgress from './WizardProgress';
 import Step1UseCase from './steps/Step1UseCase';
 import Step2Profile from './steps/Step2Profile';
@@ -21,6 +23,7 @@ const variants = {
 };
 
 function ResetConfirmDialog({ onConfirm, onCancel }) {
+  const { t } = useTranslation();
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
       <motion.div
@@ -35,8 +38,8 @@ function ResetConfirmDialog({ onConfirm, onCancel }) {
             <AlertTriangle className="w-5 h-5 text-amber-500" />
           </div>
           <div>
-            <h3 className="text-base font-semibold text-slate-900 dark:text-white">Start over?</h3>
-            <p className="text-sm text-slate-500 dark:text-slate-400">All your answers will be cleared.</p>
+            <h3 className="text-base font-semibold text-slate-900 dark:text-white">{t('wizard.resetTitle')}</h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400">{t('wizard.resetMessage')}</p>
           </div>
         </div>
         <div className="flex gap-2 mt-5">
@@ -44,13 +47,13 @@ function ResetConfirmDialog({ onConfirm, onCancel }) {
             onClick={onCancel}
             className="flex-1 px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-700 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
           >
-            Cancel
+            {t('wizard.resetCancel')}
           </button>
           <button
             onClick={onConfirm}
             className="flex-1 px-4 py-2.5 rounded-lg bg-rose-500 hover:bg-rose-600 text-white text-sm font-medium transition-colors"
           >
-            Yes, start over
+            {t('wizard.resetConfirm')}
           </button>
         </div>
       </motion.div>
@@ -60,6 +63,7 @@ function ResetConfirmDialog({ onConfirm, onCancel }) {
 
 export default function WizardContainer() {
   const location = useLocation();
+  const { t } = useTranslation();
   const [step, setStep] = useState(location.state?.startAtStep ?? 1);
   const [direction, setDirection] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -100,23 +104,20 @@ export default function WizardContainer() {
     setIsSubmitting(true);
     setApiError(null);
     try {
-      const results = await getRecommendation(answers);
+      const results = await getRecommendation({ ...answers, lang: i18n.language });
       setResults(results);
       navigate('/results');
     } catch (err) {
-      setApiError(err.message || 'Failed to get recommendation. Please try again.');
+      setApiError(err.message || t('common.wizardError'));
     } finally {
       setIsSubmitting(false);
     }
   }, [answers, setResults, navigate]);
 
-  // Keyboard navigation: Enter to advance/submit, ArrowLeft to go back
   useEffect(() => {
     function onKeyDown(e) {
-      // Skip when typing inside an input/textarea/select
       const tag = e.target?.tagName;
       if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
-      // Skip when a modal is open
       if (showResetConfirm) return;
 
       if (e.key === 'ArrowLeft' && step > 1) {
@@ -126,7 +127,6 @@ export default function WizardContainer() {
       if (e.key === 'Enter') {
         if (step === 4 && answers.priorities?.length > 0) { goNext(); return; }
         if (step === 6 && !isSubmitting) { handleSubmit(); return; }
-        // Steps 1,2,3,5 auto-advance on click; Enter re-confirms if already answered
         const autoField = { 1: 'useCase', 2: 'profile', 3: 'budget', 5: 'geography' }[step];
         if (autoField && answers[autoField]) goNext();
       }
@@ -166,7 +166,7 @@ export default function WizardContainer() {
             className="flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
           >
             <ChevronLeft className="w-4 h-4" />
-            Back
+            {t('wizard.back')}
           </button>
 
           <button
@@ -174,7 +174,7 @@ export default function WizardContainer() {
             className="flex items-center gap-1.5 text-sm text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
           >
             <RotateCcw className="w-3.5 h-3.5" />
-            Start over
+            {t('wizard.startOver')}
           </button>
         </div>
 

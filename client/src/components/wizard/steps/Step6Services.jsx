@@ -1,21 +1,24 @@
 import { Table2, ListTree, HardDrive, Network, KeyRound, Cloud, Container, BrainCircuit, Mail, X } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import OptionCard from '../OptionCard';
 
-const options = [
-  { value: 'database', icon: Table2, label: 'Relational database', description: 'PostgreSQL, MySQL, SQL Server' },
-  { value: 'nosql', icon: ListTree, label: 'NoSQL database', description: 'MongoDB, DynamoDB, Firestore' },
-  { value: 'storage', icon: HardDrive, label: 'File storage', description: 'S3-compatible object storage' },
-  { value: 'cdn', icon: Network, label: 'CDN', description: 'Global content delivery network' },
-  { value: 'auth', icon: KeyRound, label: 'Authentication', description: 'User login, OAuth, SSO' },
-  { value: 'serverless', icon: Cloud, label: 'Serverless functions', description: 'Lambda, Cloud Functions, Edge' },
-  { value: 'containers', icon: Container, label: 'Containers / Kubernetes', description: 'Docker, ECS, GKE, AKS' },
-  { value: 'ml', icon: BrainCircuit, label: 'AI / ML APIs', description: 'Vision, NLP, custom models' },
-  { value: 'email', icon: Mail, label: 'Email service', description: 'Transactional or marketing email' },
-  { value: 'none', icon: X, label: 'None of the above', description: "I don't need specific services" },
-];
-
 export default function Step6Services({ value = [], onChange, onConfirm, isSubmitting }) {
+  const { t } = useTranslation();
+
+  const options = [
+    { value: 'database',   icon: Table2,      label: t('wizard.step6.database'),    description: t('wizard.step6.databaseDesc') },
+    { value: 'nosql',      icon: ListTree,    label: t('wizard.step6.nosql'),       description: t('wizard.step6.nosqlDesc') },
+    { value: 'storage',    icon: HardDrive,   label: t('wizard.step6.storage'),     description: t('wizard.step6.storageDesc') },
+    { value: 'cdn',        icon: Network,     label: t('wizard.step6.cdn'),         description: t('wizard.step6.cdnDesc') },
+    { value: 'auth',       icon: KeyRound,    label: t('wizard.step6.auth'),        description: t('wizard.step6.authDesc') },
+    { value: 'serverless', icon: Cloud,       label: t('wizard.step6.serverless'),  description: t('wizard.step6.serverlessDesc') },
+    { value: 'containers', icon: Container,   label: t('wizard.step6.containers'),  description: t('wizard.step6.containersDesc') },
+    { value: 'ml',         icon: BrainCircuit,label: t('wizard.step6.ml'),          description: t('wizard.step6.mlDesc') },
+    { value: 'email',      icon: Mail,        label: t('wizard.step6.email'),       description: t('wizard.step6.emailDesc') },
+    { value: 'none',       icon: X,           label: t('wizard.step6.none'),        description: t('wizard.step6.noneDesc') },
+  ];
+
   const toggle = (v) => {
     if (v === 'none') {
       onChange(value.includes('none') ? [] : ['none']);
@@ -34,10 +37,10 @@ export default function Step6Services({ value = [], onChange, onConfirm, isSubmi
   return (
     <div>
       <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white text-center mb-2">
-        Any specific services needed?
+        {t('wizard.step6.title')}
       </h2>
       <p className="text-slate-500 dark:text-slate-400 text-center mb-8 text-sm sm:text-base">
-        Select all that apply — this sharpens the recommendation.
+        {t('wizard.step6.subtitle')}
       </p>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {options.map((opt) => {
@@ -71,10 +74,10 @@ export default function Step6Services({ value = [], onChange, onConfirm, isSubmi
           {isSubmitting ? (
             <>
               <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              Analyzing...
+              {t('wizard.step6.analyzing')}
             </>
           ) : (
-            'Get my recommendation →'
+            t('wizard.step6.getRecommendation')
           )}
         </button>
       </motion.div>

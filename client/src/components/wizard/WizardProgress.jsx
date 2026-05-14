@@ -1,10 +1,18 @@
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { useAdvisor } from '../../context/AdvisorContext';
-
-const stepLabels = ['Use Case', 'Profile', 'Budget', 'Priorities', 'Geography', 'Services'];
 
 export default function WizardProgress({ step, totalSteps }) {
   const { state } = useAdvisor();
+  const { t } = useTranslation();
+  const stepLabels = [
+    t('wizardProgress.useCase'),
+    t('wizardProgress.profile'),
+    t('wizardProgress.budget'),
+    t('wizardProgress.priorities'),
+    t('wizardProgress.geography'),
+    t('wizardProgress.services'),
+  ];
   const isDark = state.theme === 'dark';
   const pct = (step / totalSteps) * 100;
 
@@ -16,7 +24,7 @@ export default function WizardProgress({ step, totalSteps }) {
       {/* Step label */}
       <div className="flex justify-between items-center mb-3">
         <span className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-          Step {step} of {totalSteps}
+          {t('wizardProgress.stepOf', { step, total: totalSteps })}
         </span>
         <span className="text-xs font-semibold text-primary-600 dark:text-primary-400">
           {stepLabels[step - 1]}

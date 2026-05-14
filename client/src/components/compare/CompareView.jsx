@@ -1,19 +1,21 @@
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { cn } from '../../lib/utils';
 import FeatureMatrix from './FeatureMatrix';
 
 export default function CompareView({ selectedIds, onToggle, fullProviders }) {
+  const { t } = useTranslation();
   const selected = fullProviders.filter((p) => selectedIds.includes(p.id));
   const canCompare = selected.length >= 2 && selected.length <= 3;
 
   return (
     <div>
-      {/* Provider selector */}
       <div className="mb-6">
         <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">
-          Select 2 or 3 providers to compare. {selected.length > 0 && (
+          {t('compare.select23')}{' '}
+          {selected.length > 0 && (
             <span className="font-medium text-slate-700 dark:text-slate-300">
-              {selected.length} selected.
+              {t('compare.selectedCount', { count: selected.length })}
             </span>
           )}
         </p>
@@ -27,7 +29,7 @@ export default function CompareView({ selectedIds, onToggle, fullProviders }) {
                 onClick={() => !isDisabled && onToggle(p.id)}
                 disabled={isDisabled}
                 aria-pressed={isSelected}
-                aria-label={`${isSelected ? 'Remove' : 'Add'} ${p.name} from comparison`}
+                aria-label={`${isSelected ? t('common.remove') : t('common.add')} ${p.name}`}
                 className={cn(
                   'flex items-center gap-2 px-4 py-2 rounded-full border-2 text-sm font-semibold transition-all duration-150',
                   isSelected
@@ -50,7 +52,6 @@ export default function CompareView({ selectedIds, onToggle, fullProviders }) {
         </div>
       </div>
 
-      {/* Feature matrix */}
       {canCompare ? (
         <motion.div
           initial={{ opacity: 0 }}
@@ -62,7 +63,7 @@ export default function CompareView({ selectedIds, onToggle, fullProviders }) {
         </motion.div>
       ) : (
         <div className="text-center py-16 text-slate-400 dark:text-slate-500 text-sm">
-          Select at least 2 providers above to see the comparison.
+          {t('compare.selectAtLeast2')}
         </div>
       )}
     </div>

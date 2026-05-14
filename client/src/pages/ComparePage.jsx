@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useSearchParams } from 'react-router-dom';
 import { Link2, Check } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useAdvisor } from '../context/AdvisorContext';
 import CompareView from '../components/compare/CompareView';
 import { usePageTitle } from '../hooks/usePageTitle';
@@ -56,8 +57,8 @@ export default function ComparePage() {
   const ranked = state.results?.ranked ?? [];
   const [searchParams, setSearchParams] = useSearchParams();
   const [copied, setCopied] = useState(false);
+  const { t } = useTranslation();
 
-  // Always show all 8 providers; merge scores from wizard results where available
   const fullProviders = useMemo(() =>
     STATIC_PROVIDERS.map((p) => {
       const r = ranked.find((r) => r.id === p.id);
@@ -66,7 +67,6 @@ export default function ComparePage() {
   [ranked]);
 
   const defaultSelected = useMemo(() => {
-    // 1. Prefer ?p= URL param (accepts 1+ IDs; fills to 3 with defaults if only 1 given)
     const urlParam = searchParams.get('p');
     if (urlParam) {
       const ids = urlParam.split(',').filter((id) => STATIC_PROVIDERS.some((p) => p.id === id));
@@ -76,9 +76,7 @@ export default function ComparePage() {
         return [...ids, ...fill];
       }
     }
-    // 2. Wizard results
     if (ranked.length > 0) return ranked.slice(0, 3).map((p) => p.id);
-    // 3. Default first 3
     return STATIC_PROVIDERS.slice(0, 3).map((p) => p.id);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -88,7 +86,6 @@ export default function ComparePage() {
 
   const fromResults = ranked.length > 0;
 
-  // Persist to history whenever a valid comparison is active
   useEffect(() => {
     if (selectedIds.length >= 2) {
       saveToHistory(selectedIds, fullProviders);
@@ -99,7 +96,6 @@ export default function ComparePage() {
   const toggle = (id) => {
     setSelectedIds((prev) => {
       const next = prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id];
-      // Keep URL in sync so the link is always shareable
       if (next.length >= 2) {
         setSearchParams({ p: next.join(',') }, { replace: true });
       }
@@ -115,7 +111,6 @@ export default function ComparePage() {
   };
 
   const restoreHistory = (ids) => {
-    // Only restore ids that exist in fullProviders
     const valid = ids.filter((id) => fullProviders.some((p) => p.id === id));
     setSelectedIds(valid);
   };
@@ -130,12 +125,10 @@ export default function ComparePage() {
       <div className="mb-8 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white mb-1">
-            Compare providers
+            {t('compare.title')}
           </h1>
           <p className="text-slate-500 dark:text-slate-400 text-sm">
-            {fromResults
-              ? 'Pre-populated with your top 3 results. All 8 providers available — toggle to swap any out.'
-              : 'Select 2–3 providers from all 8 to compare side-by-side.'}
+            {fromResults ? t('compare.subtitleFromResults') : t('compare.subtitleDefault')}
           </p>
         </div>
         {selectedIds.length >= 2 && (
@@ -145,7 +138,7 @@ export default function ComparePage() {
             className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-medium transition-colors flex-shrink-0 self-start"
           >
             {copied ? <Check className="w-4 h-4 text-emerald-500" /> : <Link2 className="w-4 h-4" />}
-            {copied ? 'Copied!' : 'Share link'}
+            {copied ? t('results.copied') : t('compare.shareLink')}
           </button>
         )}
       </div>
@@ -156,11 +149,10 @@ export default function ComparePage() {
         fullProviders={fullProviders}
       />
 
-      {/* Comparison history */}
       {history.length > 0 && (
         <div className="mt-10">
           <h2 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">
-            Recent comparisons
+            {t('compare.recentComparisons')}
           </h2>
           <div className="flex flex-wrap gap-2">
             {history.map((item) => (
@@ -176,7 +168,6 @@ export default function ComparePage() {
           </div>
         </div>
       )}
-
     </motion.div>
   );
 }

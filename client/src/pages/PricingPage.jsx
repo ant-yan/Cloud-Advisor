@@ -1,9 +1,11 @@
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import PricingEstimator from '../components/pricing/PricingEstimator';
 import { usePageTitle } from '../hooks/usePageTitle';
 
 export default function PricingPage() {
   usePageTitle('Pricing Estimator');
+  const { t } = useTranslation();
 
   return (
     <motion.div
@@ -14,10 +16,10 @@ export default function PricingPage() {
     >
       <div className="mb-8">
         <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white mb-1">
-          Pricing Estimator
+          {t('pricing.title')}
         </h1>
         <p className="text-slate-500 dark:text-slate-400 text-sm">
-          Adjust the sliders to estimate your monthly cloud bill across all 8 providers.
+          {t('pricing.subtitle')}
         </p>
       </div>
       <PricingEstimator />

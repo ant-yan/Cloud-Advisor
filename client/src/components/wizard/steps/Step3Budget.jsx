@@ -1,22 +1,25 @@
 import { Gift, DollarSign, TrendingUp, BarChart2, Infinity } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import OptionCard from '../OptionCard';
 
-const options = [
-  { value: 'free', icon: Gift, label: 'Free tier only', description: "I need to get started at $0" },
-  { value: 'under50', icon: DollarSign, label: 'Under $50 / mo', description: 'Small project or side hustle' },
-  { value: '50-200', icon: TrendingUp, label: '$50 – $200 / mo', description: 'Growing project with real traffic' },
-  { value: '200-1000', icon: BarChart2, label: '$200 – $1,000 / mo', description: 'Established product or business' },
-  { value: '1000+', icon: Infinity, label: '$1,000+ / mo', description: 'Scale or enterprise workload' },
-];
-
 export default function Step3Budget({ value, onChange }) {
+  const { t } = useTranslation();
+
+  const options = [
+    { value: 'free',     icon: Gift,       label: t('wizard.step3.free'),     description: t('wizard.step3.freeDesc') },
+    { value: 'under50',  icon: DollarSign, label: t('wizard.step3.under50'),  description: t('wizard.step3.under50Desc') },
+    { value: '50-200',   icon: TrendingUp, label: t('wizard.step3.50_200'),   description: t('wizard.step3.50_200Desc') },
+    { value: '200-1000', icon: BarChart2,  label: t('wizard.step3.200_1000'), description: t('wizard.step3.200_1000Desc') },
+    { value: '1000+',    icon: Infinity,   label: t('wizard.step3.1000plus'), description: t('wizard.step3.1000plusDesc') },
+  ];
+
   return (
     <div>
       <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white text-center mb-2">
-        What's your monthly budget?
+        {t('wizard.step3.title')}
       </h2>
       <p className="text-slate-500 dark:text-slate-400 text-center mb-8 text-sm sm:text-base">
-        This is an estimate — you can always scale up later.
+        {t('wizard.step3.subtitle')}
       </p>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {options.map((opt) => (

@@ -2,17 +2,19 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ArrowRight, Sparkles } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const STORAGE_KEY = 'cloudadvisor_onboarded';
 
 export default function OnboardingBanner() {
   const [visible, setVisible] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     try {
       if (!localStorage.getItem(STORAGE_KEY)) {
-        const t = setTimeout(() => setVisible(true), 900);
-        return () => clearTimeout(t);
+        const timer = setTimeout(() => setVisible(true), 900);
+        return () => clearTimeout(timer);
       }
     } catch {
       // localStorage blocked — skip
@@ -41,23 +43,23 @@ export default function OnboardingBanner() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-slate-900 dark:text-white leading-snug">
-                  New here? Find your cloud in 2 min
+                  {t('onboarding.title')}
                 </p>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
-                  Answer 6 quick questions — our scoring engine ranks all 8 providers for your exact use case.
+                  {t('onboarding.message')}
                 </p>
                 <Link
                   to="/wizard"
                   onClick={dismiss}
                   className="inline-flex items-center gap-1 mt-2 text-xs font-semibold text-primary-600 dark:text-primary-400 hover:underline"
                 >
-                  Start the wizard
+                  {t('onboarding.startWizard')}
                   <ArrowRight className="w-3 h-3" />
                 </Link>
               </div>
               <button
                 onClick={dismiss}
-                aria-label="Dismiss"
+                aria-label={t('common.dismiss')}
                 className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
               >
                 <X className="w-3.5 h-3.5" />

@@ -2,12 +2,14 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { CheckCircle2, XCircle, ChevronDown, ChevronUp, Trophy, ExternalLink } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import ScoreBreakdown from './ScoreBreakdown';
 import { cn, getScoreColor, getScoreBg } from '../../lib/utils';
 
 export default function ProviderCard({ provider, rank, delay = 0 }) {
   const [expanded, setExpanded] = useState(rank === 1);
   const isTop = rank === 1;
+  const { t } = useTranslation();
 
   return (
     <motion.div
@@ -21,15 +23,10 @@ export default function ProviderCard({ provider, rank, delay = 0 }) {
           : 'border-slate-200 dark:border-slate-700'
       )}
     >
-      {/* Header */}
-      <div
-        className="h-1.5 w-full"
-        style={{ backgroundColor: provider.brandColor }}
-      />
+      <div className="h-1.5 w-full" style={{ backgroundColor: provider.brandColor }} />
 
       <div className="p-5">
         <div className="flex items-start justify-between gap-4">
-          {/* Left: rank + name */}
           <div className="flex items-center gap-3 min-w-0">
             {isTop && (
               <div className="flex-shrink-0 w-7 h-7 rounded-full bg-amber-400 flex items-center justify-center">
@@ -48,7 +45,7 @@ export default function ProviderCard({ provider, rank, delay = 0 }) {
                 </h3>
                 {isTop && (
                   <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300">
-                    Best match
+                    {t('results.bestMatch')}
                   </span>
                 )}
               </div>
@@ -58,7 +55,6 @@ export default function ProviderCard({ provider, rank, delay = 0 }) {
             </div>
           </div>
 
-          {/* Score badge */}
           <div className={cn('flex-shrink-0 w-16 h-16 rounded-2xl flex flex-col items-center justify-center', getScoreBg(provider.score))}>
             <span className={cn('text-2xl font-extrabold leading-none', getScoreColor(provider.score))}>
               {provider.score}
@@ -67,10 +63,9 @@ export default function ProviderCard({ provider, rank, delay = 0 }) {
           </div>
         </div>
 
-        {/* Pros & Cons — always visible */}
         <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 mb-2 uppercase tracking-wide">Pros</p>
+            <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 mb-2 uppercase tracking-wide">{t('results.pros')}</p>
             <ul className="space-y-1.5">
               {provider.pros.slice(0, 3).map((pro, i) => (
                 <li key={i} className="flex items-start gap-2 text-xs text-slate-700 dark:text-slate-300">
@@ -81,7 +76,7 @@ export default function ProviderCard({ provider, rank, delay = 0 }) {
             </ul>
           </div>
           <div>
-            <p className="text-xs font-semibold text-rose-500 dark:text-rose-400 mb-2 uppercase tracking-wide">Cons</p>
+            <p className="text-xs font-semibold text-rose-500 dark:text-rose-400 mb-2 uppercase tracking-wide">{t('results.cons')}</p>
             <ul className="space-y-1.5">
               {provider.cons.slice(0, 3).map((con, i) => (
                 <li key={i} className="flex items-start gap-2 text-xs text-slate-700 dark:text-slate-300">
@@ -93,20 +88,19 @@ export default function ProviderCard({ provider, rank, delay = 0 }) {
           </div>
         </div>
 
-        {/* Bottom row: score toggle + deep-dive link */}
         <div className="mt-4 flex items-center justify-between flex-wrap gap-2">
           <button
             onClick={() => setExpanded((e) => !e)}
             className="flex items-center gap-1.5 text-xs font-medium text-slate-500 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
           >
             {expanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-            {expanded ? 'Hide' : 'Show'} score breakdown
+            {expanded ? t('results.hideScoreBreakdown') : t('results.showScoreBreakdown')}
           </button>
           <Link
             to={`/providers/${provider.id}`}
             className="flex items-center gap-1 text-xs font-medium text-slate-400 dark:text-slate-500 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
           >
-            Full profile
+            {t('results.fullProfile')}
             <ExternalLink className="w-3 h-3" />
           </Link>
         </div>

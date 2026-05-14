@@ -1,40 +1,44 @@
 import { useEffect, useRef, useMemo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { MessageCircle, X, RotateCcw, Square, KeyRound } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useAdvisor } from '../../context/AdvisorContext';
 import { useChat } from '../../hooks/useChat';
+import i18n from '../../i18n';
 import ChatMessage from './ChatMessage';
 import ChatInput from './ChatInput';
 
 function StarterQuestions({ topProvider, onSelect }) {
+  const { t } = useTranslation();
+
   const questions = useMemo(() => {
     if (topProvider) {
       return [
-        `Why was ${topProvider} recommended for me?`,
-        `How do I get started with ${topProvider}?`,
-        `What are the hidden costs I should know about?`,
-        `Is ${topProvider} right for a complete beginner?`,
+        t('chat.questionWhyRecommended', { name: topProvider }),
+        t('chat.questionGetStarted', { name: topProvider }),
+        t('chat.questionHiddenCosts'),
+        t('chat.questionBeginner', { name: topProvider }),
       ];
     }
     return [
-      "What's the difference between AWS, GCP, and Azure?",
-      'Which cloud provider is best for a small startup?',
-      'How do I choose between serverless and containers?',
-      'What cloud services do I need to host a web app?',
+      t('chat.questionDifference'),
+      t('chat.questionStartup'),
+      t('chat.questionServerless'),
+      t('chat.questionWebApp'),
     ];
-  }, [topProvider]);
+  }, [topProvider, t]);
 
   return (
     <div className="p-4">
       {!topProvider && (
         <div className="mb-4 p-3 rounded-xl bg-primary-50 dark:bg-primary-900/20 border border-primary-100 dark:border-primary-800/40">
-          <p className="text-xs font-semibold text-primary-700 dark:text-primary-300 mb-0.5">CloudAdvisor AI</p>
+          <p className="text-xs font-semibold text-primary-700 dark:text-primary-300 mb-0.5">{t('chat.title')}</p>
           <p className="text-xs text-primary-600 dark:text-primary-400 leading-relaxed">
-            Hi! Ask me anything about cloud providers, pricing, architecture, or which platform fits your project.
+            {t('chat.starterMessage')}
           </p>
         </div>
       )}
-      <p className="text-xs text-slate-400 dark:text-slate-500 mb-2">Suggested questions:</p>
+      <p className="text-xs text-slate-400 dark:text-slate-500 mb-2">{t('chat.suggestedQuestions')}</p>
       <div className="space-y-2">
         {questions.map((q) => (
           <button
@@ -52,6 +56,7 @@ function StarterQuestions({ topProvider, onSelect }) {
 
 export default function ChatPanel() {
   const { state } = useAdvisor();
+  const { t } = useTranslation();
   const messagesEndRef = useRef(null);
 
   const context = useMemo(() => {
@@ -62,8 +67,9 @@ export default function ChatPanel() {
       useCase: state.answers?.useCase ?? null,
       budget: state.answers?.budget ?? null,
       priorities: state.answers?.priorities ?? [],
+      lang: i18n.language,
     };
-  }, [state.results, state.answers]);
+  }, [state.results, state.answers, i18n.language]);
 
   const { messages, isStreaming, isOpen, apiKeyMissing, sendMessage, abortStream, clearMessages, toggleOpen } = useChat(context);
 
@@ -91,18 +97,17 @@ export default function ChatPanel() {
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 bg-primary-500">
               <div>
-                <p className="text-sm font-semibold text-white">CloudAdvisor AI</p>
+                <p className="text-sm font-semibold text-white">{t('chat.title')}</p>
                 <p className="text-xs text-primary-200">
-                  {topProvider ? `Context: ${topProvider} recommendation` : 'Ask me anything about cloud'}
+                  {topProvider ? t('chat.contextWith', { name: topProvider }) : t('chat.contextDefault')}
                 </p>
               </div>
               <div className="flex items-center gap-1">
-                {/* Stop streaming button */}
                 {isStreaming && (
                   <button
                     onClick={abortStream}
-                    aria-label="Stop response"
-                    title="Stop generating"
+                    aria-label={t('chat.stopResponse')}
+                    title={t('chat.stopResponse')}
                     className="p-1.5 rounded-lg text-primary-200 hover:text-white hover:bg-primary-600 transition-colors"
                   >
                     <Square className="w-3.5 h-3.5 fill-current" />
@@ -111,7 +116,7 @@ export default function ChatPanel() {
                 {messages.length > 0 && !isStreaming && (
                   <button
                     onClick={clearMessages}
-                    aria-label="Clear conversation"
+                    aria-label={t('chat.clearConversation')}
                     className="p-1.5 rounded-lg text-primary-200 hover:text-white hover:bg-primary-600 transition-colors"
                   >
                     <RotateCcw className="w-3.5 h-3.5" />
@@ -119,7 +124,7 @@ export default function ChatPanel() {
                 )}
                 <button
                   onClick={toggleOpen}
-                  aria-label="Close chat"
+                  aria-label={t('chat.closeChat')}
                   className="p-1.5 rounded-lg text-primary-200 hover:text-white hover:bg-primary-600 transition-colors"
                 >
                   <X className="w-4 h-4" />
@@ -146,9 +151,9 @@ export default function ChatPanel() {
               <div className="mx-4 mb-3 flex items-start gap-2.5 p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40">
                 <KeyRound className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-xs font-semibold text-amber-700 dark:text-amber-300">API key not configured</p>
+                  <p className="text-xs font-semibold text-amber-700 dark:text-amber-300">{t('chat.apiKeyMissingTitle')}</p>
                   <p className="text-xs text-amber-600 dark:text-amber-400 mt-0.5 leading-relaxed">
-                    Add <code className="font-mono bg-amber-100 dark:bg-amber-900/40 px-1 rounded">OPENAI_API_KEY</code> to <code className="font-mono bg-amber-100 dark:bg-amber-900/40 px-1 rounded">server/.env</code> to enable AI chat.
+                    {t('chat.apiKeyMissingMessage')}
                   </p>
                 </div>
               </div>
@@ -164,7 +169,7 @@ export default function ChatPanel() {
       <motion.button
         onClick={toggleOpen}
         whileTap={{ scale: 0.93 }}
-        aria-label={isOpen ? 'Close chat' : 'Open chat assistant'}
+        aria-label={isOpen ? t('chat.closeChat') : t('chat.openChat')}
         className="w-12 h-12 flex items-center justify-center rounded-full bg-primary-500 hover:bg-primary-600 text-white shadow-lg shadow-primary-500/30 transition-colors"
       >
         <AnimatePresence mode="wait">

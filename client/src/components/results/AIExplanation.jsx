@@ -1,15 +1,18 @@
 import { Sparkles } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function AIExplanation({ explanation }) {
+  const { t } = useTranslation();
+
   if (!explanation) {
     return (
       <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
         <div className="flex items-center gap-2 mb-2">
           <Sparkles className="w-4 h-4 text-slate-400 dark:text-slate-500" />
-          <span className="text-sm font-medium text-slate-400 dark:text-slate-500">AI Explanation</span>
+          <span className="text-sm font-medium text-slate-400 dark:text-slate-500">{t('results.aiExplanation')}</span>
         </div>
         <p className="text-sm text-slate-400 dark:text-slate-500 italic">
-          Add an <code className="bg-slate-200 dark:bg-slate-700 px-1 rounded text-xs">OPENAI_API_KEY</code> to the server <code className="bg-slate-200 dark:bg-slate-700 px-1 rounded text-xs">.env</code> to enable personalized explanations.
+          {t('results.aiExplanationFallback')}
         </p>
       </div>
     );
@@ -21,7 +24,7 @@ export default function AIExplanation({ explanation }) {
         <div className="w-6 h-6 rounded-full bg-primary-500 flex items-center justify-center">
           <Sparkles className="w-3.5 h-3.5 text-white" />
         </div>
-        <span className="text-sm font-semibold text-primary-700 dark:text-primary-300">AI Explanation</span>
+        <span className="text-sm font-semibold text-primary-700 dark:text-primary-300">{t('results.aiExplanation')}</span>
       </div>
       <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-line">
         {explanation}

@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Search, BookOpen } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '../hooks/usePageTitle';
 
 const terms = [
@@ -905,7 +906,7 @@ const terms = [
   },
 ];
 
-const ALL_TAGS = ['All', ...Array.from(new Set(terms.flatMap((t) => t.tags))).sort()];
+const TERM_TAGS = [...new Set(terms.flatMap((t) => t.tags))].sort();
 
 const cardVariants = {
   hidden: { opacity: 0, y: 12 },
@@ -914,21 +915,25 @@ const cardVariants = {
 
 export default function GlossaryPage() {
   usePageTitle('Cloud Glossary');
+  const { t } = useTranslation();
   const [query, setQuery] = useState('');
   const [activeTag, setActiveTag] = useState('All');
 
+  const allTags = [t('glossary.tagAll'), ...TERM_TAGS];
+
   const filtered = useMemo(() => {
     const q = query.toLowerCase().trim();
-    return terms.filter((t) => {
-      const matchesTag = activeTag === 'All' || t.tags.includes(activeTag);
+    const tagMatch = activeTag === t('glossary.tagAll') ? null : activeTag;
+    return terms.filter((term) => {
+      const matchesTag = !tagMatch || term.tags.includes(tagMatch);
       const matchesQuery =
         !q ||
-        t.term.toLowerCase().includes(q) ||
-        (t.full && t.full.toLowerCase().includes(q)) ||
-        t.definition.toLowerCase().includes(q);
+        term.term.toLowerCase().includes(q) ||
+        (term.full && term.full.toLowerCase().includes(q)) ||
+        term.definition.toLowerCase().includes(q);
       return matchesTag && matchesQuery;
     });
-  }, [query, activeTag]);
+  }, [query, activeTag, t]);
 
   return (
     <motion.div
@@ -943,11 +948,11 @@ export default function GlossaryPage() {
             <BookOpen className="w-4 h-4 text-primary-600 dark:text-primary-400" />
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">
-            Cloud Glossary
+            {t('glossary.title')}
           </h1>
         </div>
         <p className="text-slate-500 dark:text-slate-400 text-sm">
-          {terms.length} plain-English definitions — from complete beginner to advanced cloud concepts.
+          {t('glossary.subtitle', { count: terms.length })}
         </p>
       </div>
 
@@ -957,13 +962,13 @@ export default function GlossaryPage() {
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search terms or definitions…"
+          placeholder={t('glossary.searchPlaceholder')}
           className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
         />
       </div>
 
       <div className="flex flex-wrap gap-2 mb-8">
-        {ALL_TAGS.map((tag) => (
+        {allTags.map((tag) => (
           <button
             key={tag}
             onClick={() => setActiveTag(tag)}
@@ -980,19 +985,19 @@ export default function GlossaryPage() {
 
       {filtered.length !== terms.length && (
         <p className="text-xs text-slate-400 dark:text-slate-500 mb-4">
-          Showing {filtered.length} of {terms.length} terms
+          {t('glossary.showing', { filtered: filtered.length, total: terms.length })}
         </p>
       )}
 
       {filtered.length === 0 ? (
         <div className="text-center py-16 text-slate-400 dark:text-slate-500 text-sm">
-          No terms match "{query}". Try a different search.
+          {t('glossary.noMatch', { query })}
         </div>
       ) : (
         <div className="space-y-3">
-          {filtered.map((t, i) => (
+          {filtered.map((term, i) => (
             <motion.div
-              key={t.term}
+              key={term.term}
               custom={i}
               initial="hidden"
               animate="visible"
@@ -1000,12 +1005,12 @@ export default function GlossaryPage() {
               className="bg-white dark:bg-slate-900 rounded-card border border-slate-200 dark:border-slate-700 p-5 shadow-card"
             >
               <div className="mb-2">
-                <span className="font-bold text-slate-900 dark:text-white text-base">{t.term}</span>
-                {t.full && t.full !== t.term && (
-                  <span className="ml-2 text-sm text-slate-500 dark:text-slate-400">— {t.full}</span>
+                <span className="font-bold text-slate-900 dark:text-white text-base">{term.term}</span>
+                {term.full && term.full !== term.term && (
+                  <span className="ml-2 text-sm text-slate-500 dark:text-slate-400">— {term.full}</span>
                 )}
               </div>
-              <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">{t.definition}</p>
+              <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">{term.definition}</p>
             </motion.div>
           ))}
         </div>

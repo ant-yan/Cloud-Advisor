@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, CheckCircle, Star, Zap, RotateCcw, PlayCircle, ExternalLink } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import UseCaseShortcuts from '../components/shortcuts/UseCaseShortcuts';
 import { useAdvisor } from '../context/AdvisorContext';
 import { usePageTitle } from '../hooks/usePageTitle';
@@ -20,6 +21,7 @@ function getResumeStep(answers) {
 
 function ResumeBar({ answers, results, onReset }) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const hasPartial = STEP_FIELDS.some((f) => {
     const v = answers[f];
     return v !== null && v !== undefined && !(Array.isArray(v) && v.length === 0);
@@ -37,7 +39,7 @@ function ResumeBar({ answers, results, onReset }) {
         className="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 px-4 py-3 rounded-xl bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800/40"
       >
         <p className="text-sm text-primary-700 dark:text-primary-300 font-medium">
-          You have a saved recommendation — want to view it?
+          {t('home.resumeHasResults')}
         </p>
         <div className="flex items-center gap-2 flex-shrink-0">
           <Link
@@ -45,14 +47,14 @@ function ResumeBar({ answers, results, onReset }) {
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary-500 hover:bg-primary-600 text-white text-xs font-semibold transition-colors"
           >
             <PlayCircle className="w-3.5 h-3.5" />
-            View results
+            {t('home.resumeViewResults')}
           </Link>
           <button
             onClick={onReset}
             className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-primary-200 dark:border-primary-700 text-xs font-medium text-primary-600 dark:text-primary-400 hover:bg-primary-100 dark:hover:bg-primary-900/40 transition-colors"
           >
             <RotateCcw className="w-3 h-3" />
-            Start fresh
+            {t('home.resumeStartFresh')}
           </button>
         </div>
       </motion.div>
@@ -69,7 +71,7 @@ function ResumeBar({ answers, results, onReset }) {
       className="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 px-4 py-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40"
     >
       <p className="text-sm text-amber-700 dark:text-amber-300 font-medium">
-        You have a wizard session in progress — continue from step {resumeStep}?
+        {t('home.resumeInProgress', { step: resumeStep })}
       </p>
       <div className="flex items-center gap-2 flex-shrink-0">
         <button
@@ -77,40 +79,41 @@ function ResumeBar({ answers, results, onReset }) {
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold transition-colors"
         >
           <PlayCircle className="w-3.5 h-3.5" />
-          Continue
+          {t('home.resumeContinue')}
         </button>
         <button
           onClick={onReset}
           className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-amber-200 dark:border-amber-700 text-xs font-medium text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-colors"
         >
           <RotateCcw className="w-3 h-3" />
-          Start fresh
+          {t('home.resumeStartFresh')}
         </button>
       </div>
     </motion.div>
   );
 }
 
-const TYPING_TEXTS = [
-  'Answer 6 questions. Get an AI-powered cloud recommendation.',
-  'AWS, GCP, Azure — find out which one is right for you.',
-  'Stop guessing. Start building on the right cloud.',
-  'From free tier to enterprise scale, we score it all.',
-  'The fastest way to pick your cloud provider.',
-];
-
 const TYPE_SPEED = 38;
 const DELETE_SPEED = 18;
 const PAUSE_AFTER = 2400;
 
 function TypewriterText() {
+  const { t } = useTranslation();
+  const texts = t('home.typing', { returnObjects: true });
   const [display, setDisplay] = useState('');
   const [textIdx, setTextIdx] = useState(0);
   const [charIdx, setCharIdx] = useState(0);
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
-    const current = TYPING_TEXTS[textIdx];
+    setDisplay('');
+    setTextIdx(0);
+    setCharIdx(0);
+    setDeleting(false);
+  }, [texts[0]]); // reset when language changes
+
+  useEffect(() => {
+    const current = texts[textIdx] || '';
 
     if (!deleting && charIdx < current.length) {
       const t = setTimeout(() => {
@@ -135,9 +138,9 @@ function TypewriterText() {
 
     if (deleting && charIdx === 0) {
       setDeleting(false);
-      setTextIdx((i) => (i + 1) % TYPING_TEXTS.length);
+      setTextIdx((i) => (i + 1) % texts.length);
     }
-  }, [charIdx, deleting, textIdx]);
+  }, [charIdx, deleting, textIdx, texts]);
 
   return (
     <span>
@@ -147,15 +150,22 @@ function TypewriterText() {
   );
 }
 
-const features = [
-  { icon: Zap, text: '6-step guided wizard — done in under 2 minutes' },
-  { icon: CheckCircle, text: 'Deterministic scoring across 5 weighted dimensions' },
-  { icon: Star, text: 'AI-generated explanation in plain English' },
-];
-
 export default function HomePage() {
   usePageTitle(null);
   const { state, reset } = useAdvisor();
+  const { t } = useTranslation();
+
+  const features = [
+    { icon: Zap, text: t('home.feature1') },
+    { icon: CheckCircle, text: t('home.feature2') },
+    { icon: Star, text: t('home.feature3') },
+  ];
+
+  const howItWorks = [
+    { step: '01', title: t('home.step01Title'), desc: t('home.step01Desc') },
+    { step: '02', title: t('home.step02Title'), desc: t('home.step02Desc') },
+    { step: '03', title: t('home.step03Title'), desc: t('home.step03Desc') },
+  ];
 
   return (
     <div className="min-h-screen">
@@ -171,13 +181,13 @@ export default function HomePage() {
           </AnimatePresence>
           <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 rounded-full text-sm font-medium mb-6">
             <span className="w-1.5 h-1.5 bg-primary-500 rounded-full animate-pulse" />
-            Free &amp; No account required
+            {t('home.badge')}
           </div>
 
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-5 leading-tight">
-            Find your perfect{' '}
+            {t('home.hero')}{' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-500 to-secondary-500">
-              cloud provider
+              {t('home.heroHighlight')}
             </span>
           </h1>
 
@@ -190,14 +200,14 @@ export default function HomePage() {
               to="/wizard"
               className="inline-flex items-center gap-2 px-6 py-3.5 bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-lg transition-colors text-base shadow-md shadow-primary-500/25"
             >
-              Start the wizard
+              {t('home.ctaWizard')}
               <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
               to="/compare"
               className="inline-flex items-center gap-2 px-6 py-3.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-semibold rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors text-base"
             >
-              Compare providers
+              {t('home.ctaCompare')}
             </Link>
           </div>
 
@@ -220,26 +230,10 @@ export default function HomePage() {
       <section className="bg-slate-50 dark:bg-slate-900/50 py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white mb-10">
-            How CloudAdvisor works
+            {t('home.howItWorksTitle')}
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
-            {[
-              {
-                step: '01',
-                title: 'Answer 6 questions',
-                desc: "Tell us what you're building, your budget, and what matters most to you.",
-              },
-              {
-                step: '02',
-                title: 'Get your score',
-                desc: 'Our scoring engine rates all 8 providers — AWS, GCP, Azure, DigitalOcean, Vercel, Netlify, Render, and Cloudflare — across 5 weighted dimensions.',
-              },
-              {
-                step: '03',
-                title: 'Understand why',
-                desc: 'An AI assistant explains the recommendation in plain English and answers your follow-up questions.',
-              },
-            ].map((item) => (
+            {howItWorks.map((item) => (
               <div key={item.step} className="text-left">
                 <div className="text-4xl font-black text-primary-100 dark:text-primary-900 mb-3">{item.step}</div>
                 <h3 className="font-semibold text-slate-900 dark:text-white mb-2">{item.title}</h3>
@@ -255,10 +249,10 @@ export default function HomePage() {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
             <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white mb-2">
-              Browse all 8 providers
+              {t('home.browseTitle')}
             </h2>
             <p className="text-sm text-slate-500 dark:text-slate-400">
-              Explore full profiles, pros/cons, and feature checklists for every platform we evaluate.
+              {t('home.browseSubtitle')}
             </p>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 auto-rows-fr">
@@ -285,7 +279,7 @@ export default function HomePage() {
                         </span>
                         {p.alwaysFree && (
                           <span className="flex-shrink-0 text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300">
-                            Free
+                            {t('home.providerFree')}
                           </span>
                         )}
                       </div>
@@ -294,7 +288,7 @@ export default function HomePage() {
                       </p>
                       <div className="flex items-center justify-end">
                         <span className="text-[10px] font-semibold text-primary-500 dark:text-primary-400 group-hover:underline flex items-center gap-0.5">
-                          Profile
+                          {t('home.providerProfile')}
                           <ExternalLink className="w-2.5 h-2.5" />
                         </span>
                       </div>

@@ -1,19 +1,25 @@
 import { Link, useLocation } from 'react-router-dom';
 import { Cloud, Menu, X } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { cn } from '../../lib/utils';
 import ThemeToggle from './ThemeToggle';
-
-const navLinks = [
-  { to: '/wizard', label: 'Cloud Wizard' },
-  { to: '/compare', label: 'Compare', match: (p) => p === '/compare' || p.startsWith('/providers') },
-  { to: '/pricing', label: 'Pricing' },
-  { to: '/glossary', label: 'Glossary' },
-];
 
 export default function Navbar() {
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { t, i18n } = useTranslation();
+
+  const navLinks = [
+    { to: '/wizard', label: t('nav.cloudWizard') },
+    { to: '/compare', label: t('nav.compare'), match: (p) => p === '/compare' || p.startsWith('/providers') },
+    { to: '/pricing', label: t('nav.pricing') },
+    { to: '/glossary', label: t('nav.glossary') },
+  ];
+
+  const toggleLang = () => {
+    i18n.changeLanguage(i18n.language === 'en' ? 'hy' : 'en');
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-slate-100 dark:border-slate-800">
@@ -53,17 +59,25 @@ export default function Navbar() {
 
           <div className="flex items-center gap-2">
             <ThemeToggle />
+            {/* Language switcher */}
+            <button
+              onClick={toggleLang}
+              className="hidden md:inline-flex items-center px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors select-none"
+              aria-label={t('common.switchLanguage')}
+            >
+              {i18n.language === 'en' ? t('nav.langHy') : t('nav.langEn')}
+            </button>
             <Link
               to="/wizard"
               className="hidden md:inline-flex items-center px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white text-sm font-medium rounded-lg transition-colors"
             >
-              Start Free →
+              {t('nav.startFree')}
             </Link>
             {/* Mobile menu button */}
             <button
               className="md:hidden p-2 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
               onClick={() => setMobileOpen((o) => !o)}
-              aria-label="Toggle menu"
+              aria-label={t('common.toggleMenu')}
             >
               {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
@@ -92,13 +106,21 @@ export default function Navbar() {
               </Link>
             );
           })}
-          <Link
-            to="/wizard"
-            onClick={() => setMobileOpen(false)}
-            className="block text-center mt-2 px-4 py-2.5 bg-primary-500 text-white text-sm font-medium rounded-lg"
-          >
-            Start Free →
-          </Link>
+          <div className="flex gap-2 pt-1">
+            <button
+              onClick={toggleLang}
+              className="flex-1 text-center px-4 py-2.5 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 text-xs font-bold rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+            >
+              {i18n.language === 'en' ? t('nav.langHy') : t('nav.langEn')}
+            </button>
+            <Link
+              to="/wizard"
+              onClick={() => setMobileOpen(false)}
+              className="flex-1 text-center px-4 py-2.5 bg-primary-500 text-white text-sm font-medium rounded-lg"
+            >
+              {t('nav.startFree')}
+            </Link>
+          </div>
         </div>
       )}
     </header>

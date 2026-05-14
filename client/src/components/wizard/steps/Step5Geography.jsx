@@ -1,21 +1,24 @@
 import { MapPin, Map, Globe, Flag } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import OptionCard from '../OptionCard';
 
-const options = [
-  { value: 'single', icon: MapPin, label: 'Just me / one region', description: "My users are all in the same country" },
-  { value: 'multiple', icon: Map, label: 'Multiple countries', description: 'Users across a few different regions' },
-  { value: 'global', icon: Globe, label: 'Global audience', description: 'Users everywhere — latency matters a lot' },
-  { value: 'specific', icon: Flag, label: 'Specific region', description: 'Data must stay in EU, US, or Asia' },
-];
-
 export default function Step5Geography({ value, onChange }) {
+  const { t } = useTranslation();
+
+  const options = [
+    { value: 'single',   icon: MapPin, label: t('wizard.step5.single'),   description: t('wizard.step5.singleDesc') },
+    { value: 'multiple', icon: Map,    label: t('wizard.step5.multiple'),  description: t('wizard.step5.multipleDesc') },
+    { value: 'global',   icon: Globe,  label: t('wizard.step5.global'),    description: t('wizard.step5.globalDesc') },
+    { value: 'specific', icon: Flag,   label: t('wizard.step5.specific'),  description: t('wizard.step5.specificDesc') },
+  ];
+
   return (
     <div>
       <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white text-center mb-2">
-        Where are your users?
+        {t('wizard.step5.title')}
       </h2>
       <p className="text-slate-500 dark:text-slate-400 text-center mb-8 text-sm sm:text-base">
-        Geographic coverage affects both performance and compliance.
+        {t('wizard.step5.subtitle')}
       </p>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {options.map((opt) => (

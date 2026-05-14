@@ -1,38 +1,6 @@
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import Tooltip from '../ui/Tooltip';
-
-const dimensions = [
-  {
-    key: 'useCase',
-    label: 'Use case match',
-    max: 30,
-    why: 'How well this provider\'s strengths align with your chosen use case (website, web app, ML, etc.). Worth up to 30 points.',
-  },
-  {
-    key: 'budget',
-    label: 'Budget fit',
-    max: 25,
-    why: 'How well the provider\'s pricing model and tiers match your declared monthly budget. Worth up to 25 points.',
-  },
-  {
-    key: 'easeOfUse',
-    label: 'Ease of use',
-    max: 20,
-    why: 'How approachable the platform is for your experience level — from individual developer to enterprise team. Worth up to 20 points.',
-  },
-  {
-    key: 'geography',
-    label: 'Geographic coverage',
-    max: 15,
-    why: 'How many regions this provider has and how well their infrastructure matches the geographic market you selected. Worth up to 15 points.',
-  },
-  {
-    key: 'services',
-    label: 'Services match',
-    max: 10,
-    why: 'How many of your required services (databases, CDN, ML APIs, auth, etc.) this provider natively offers. Worth up to 10 points.',
-  },
-];
 
 function getBarColor(pct) {
   if (pct >= 0.75) return 'bg-emerald-500';
@@ -41,6 +9,16 @@ function getBarColor(pct) {
 }
 
 export default function ScoreBreakdown({ breakdown, delay = 0 }) {
+  const { t } = useTranslation();
+
+  const dimensions = [
+    { key: 'useCase',    label: t('scoreBreakdown.useCase'),    max: 30, why: t('scoreBreakdown.useCaseWhy') },
+    { key: 'budget',     label: t('scoreBreakdown.budget'),     max: 25, why: t('scoreBreakdown.budgetWhy') },
+    { key: 'easeOfUse',  label: t('scoreBreakdown.easeOfUse'),  max: 20, why: t('scoreBreakdown.easeOfUseWhy') },
+    { key: 'geography',  label: t('scoreBreakdown.geography'),  max: 15, why: t('scoreBreakdown.geographyWhy') },
+    { key: 'services',   label: t('scoreBreakdown.services'),   max: 10, why: t('scoreBreakdown.servicesWhy') },
+  ];
+
   return (
     <div className="space-y-3">
       {dimensions.map((dim, i) => {
@@ -68,7 +46,7 @@ export default function ScoreBreakdown({ breakdown, delay = 0 }) {
         );
       })}
       <p className="text-xs text-slate-400 dark:text-slate-500 pt-1">
-        Hover any dimension label to see how it was scored.
+        {t('scoreBreakdown.hint')}
       </p>
     </div>
   );

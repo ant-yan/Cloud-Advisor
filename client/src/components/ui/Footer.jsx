@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Cloud } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const PROVIDER_LINKS = [
   { id: 'aws',          name: 'Amazon Web Services' },
@@ -13,6 +14,8 @@ const PROVIDER_LINKS = [
 ];
 
 export default function Footer() {
+  const { t } = useTranslation();
+
   return (
     <footer className="border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-950 mt-auto">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -29,24 +32,24 @@ export default function Footer() {
               </span>
             </Link>
             <p className="text-sm text-slate-500 dark:text-slate-400 max-w-xs leading-relaxed">
-              Helping non-technical users choose the right cloud provider with AI-powered guidance and plain-English explanations.
+              {t('footer.tagline')}
             </p>
           </div>
 
           {/* Tools */}
           <div>
-            <h4 className="text-sm font-semibold text-slate-900 dark:text-white mb-3">Tools</h4>
+            <h4 className="text-sm font-semibold text-slate-900 dark:text-white mb-3">{t('footer.tools')}</h4>
             <ul className="space-y-2 text-sm text-slate-500 dark:text-slate-400">
-              <li><Link to="/wizard" className="hover:text-primary-500 transition-colors">Cloud Wizard</Link></li>
-              <li><Link to="/compare" className="hover:text-primary-500 transition-colors">Compare Providers</Link></li>
-              <li><Link to="/pricing" className="hover:text-primary-500 transition-colors">Pricing Estimator</Link></li>
-              <li><Link to="/glossary" className="hover:text-primary-500 transition-colors">Cloud Glossary</Link></li>
+              <li><Link to="/wizard" className="hover:text-primary-500 transition-colors">{t('footer.toolLinks.cloudWizard')}</Link></li>
+              <li><Link to="/compare" className="hover:text-primary-500 transition-colors">{t('footer.toolLinks.compareProviders')}</Link></li>
+              <li><Link to="/pricing" className="hover:text-primary-500 transition-colors">{t('footer.toolLinks.pricingEstimator')}</Link></li>
+              <li><Link to="/glossary" className="hover:text-primary-500 transition-colors">{t('footer.toolLinks.cloudGlossary')}</Link></li>
             </ul>
           </div>
 
           {/* Providers */}
           <div>
-            <h4 className="text-sm font-semibold text-slate-900 dark:text-white mb-3">Providers</h4>
+            <h4 className="text-sm font-semibold text-slate-900 dark:text-white mb-3">{t('footer.providers')}</h4>
             <ul className="space-y-2 text-sm text-slate-500 dark:text-slate-400">
               {PROVIDER_LINKS.map((p) => (
                 <li key={p.id}>
@@ -61,7 +64,7 @@ export default function Footer() {
 
         <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800">
           <p className="text-xs text-slate-400 dark:text-slate-500 text-center sm:text-left">
-            © {new Date().getFullYear()} CloudAdvisor. Pricing estimates are approximate. Always verify with official provider documentation.
+            {t('footer.copyright', { year: new Date().getFullYear() })}
           </p>
         </div>
       </div>

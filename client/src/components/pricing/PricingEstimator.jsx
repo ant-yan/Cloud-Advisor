@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Download } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { getPricing } from '../../lib/api';
 import PricingSlider from './PricingSlider';
 import PricingBreakdown from './PricingBreakdown';
@@ -45,6 +46,7 @@ const DEFAULT_RESOURCES = {
 const ALL_PROVIDER_IDS = ['aws', 'gcp', 'azure', 'digitalocean', 'vercel', 'netlify', 'render', 'cloudflare'];
 
 export default function PricingEstimator() {
+  const { t } = useTranslation();
   const [resources, setResources] = useState(DEFAULT_RESOURCES);
   const [estimates, setEstimates] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -63,7 +65,7 @@ export default function PricingEstimator() {
         const data = await getPricing(ALL_PROVIDER_IDS, resources);
         if (!cancelled) setEstimates(data.estimates);
       } catch {
-        if (!cancelled) setError('Failed to calculate estimates. Is the server running?');
+        if (!cancelled) setError(t('pricing.fetchError'));
       } finally {
         if (!cancelled) setIsLoading(false);
       }
@@ -73,86 +75,86 @@ export default function PricingEstimator() {
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [resources]);
+  }, [resources, t]);
+
+  const computeHint = resources.computeHours === 0
+    ? t('pricing.computeHint0')
+    : resources.computeHours <= 720
+    ? t('pricing.computeHintLow', { n: resources.computeHours, pct: (resources.computeHours / 720 * 100).toFixed(0) })
+    : t('pricing.computeHintHigh', { n: resources.computeHours, x: (resources.computeHours / 720).toFixed(1) });
+
+  const storageHint = resources.storageGb === 0
+    ? t('pricing.storageHint0')
+    : resources.storageGb < 100
+    ? t('pricing.storageHintXS', { n: resources.storageGb })
+    : resources.storageGb < 1000
+    ? t('pricing.storageHintMd', { n: resources.storageGb })
+    : t('pricing.storageHintLg', { n: resources.storageGb });
+
+  const bandwidthHint = resources.bandwidthGb === 0
+    ? t('pricing.bandwidthHint0')
+    : resources.bandwidthGb < 200
+    ? t('pricing.bandwidthHintXS', { n: resources.bandwidthGb })
+    : resources.bandwidthGb < 1000
+    ? t('pricing.bandwidthHintMd', { n: resources.bandwidthGb })
+    : t('pricing.bandwidthHintLg', { n: resources.bandwidthGb });
+
+  const databasesHint = resources.databaseInstances === 0
+    ? t('pricing.databasesHint0')
+    : resources.databaseInstances === 1
+    ? t('pricing.databasesHint1')
+    : t('pricing.databasesHintN', { n: resources.databaseInstances });
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
       {/* Sliders */}
       <div className="bg-white dark:bg-slate-900 rounded-card border border-slate-200 dark:border-slate-700 p-6 shadow-card space-y-7">
-        <h2 className="text-base font-semibold text-slate-900 dark:text-white">Configure your usage</h2>
+        <h2 className="text-base font-semibold text-slate-900 dark:text-white">{t('pricing.configureUsage')}</h2>
 
         <div className="space-y-1.5">
           <PricingSlider
-            label="Compute"
-            sublabel="instance hours / month"
+            label={t('pricing.compute')}
+            sublabel={t('pricing.computeSublabel')}
             value={resources.computeHours}
             min={0}
             max={2160}
             unit="hrs"
             onChange={(v) => setResource('computeHours', v)}
-            hint={
-              resources.computeHours === 0
-                ? 'No compute — good for static sites or serverless-only.'
-                : resources.computeHours <= 720
-                ? `${resources.computeHours} hrs = ${(resources.computeHours / 720 * 100).toFixed(0)}% of one server running 24/7 for a month.`
-                : `${resources.computeHours} hrs = ${(resources.computeHours / 720).toFixed(1)}× the cost of one always-on server.`
-            }
+            hint={computeHint}
           />
           <p className="text-xs text-slate-400 dark:text-slate-500 leading-relaxed">
-            ⚡ For Vercel, Netlify, and Cloudflare, hours are converted to estimated function invocations (1 hr ≈ 5,000 requests — realistic average for typical web apps).
+            {t('pricing.computeNote')}
           </p>
         </div>
         <PricingSlider
-          label="Storage"
-          sublabel="GB stored"
+          label={t('pricing.storage')}
+          sublabel={t('pricing.storageSublabel')}
           value={resources.storageGb}
           min={0}
           max={5000}
           unit="GB"
           onChange={(v) => setResource('storageGb', v)}
-          hint={
-            resources.storageGb === 0
-              ? 'No persistent storage selected.'
-              : resources.storageGb < 100
-              ? `${resources.storageGb} GB — suitable for small apps, logs, or a few media files.`
-              : resources.storageGb < 1000
-              ? `${resources.storageGb} GB — mid-range; covers most production apps.`
-              : `${resources.storageGb} GB — large dataset or media-heavy workload.`
-          }
+          hint={storageHint}
         />
         <PricingSlider
-          label="Bandwidth"
-          sublabel="GB outbound / month"
+          label={t('pricing.bandwidth')}
+          sublabel={t('pricing.bandwidthSublabel')}
           value={resources.bandwidthGb}
           min={0}
           max={2000}
           unit="GB"
           onChange={(v) => setResource('bandwidthGb', v)}
-          hint={
-            resources.bandwidthGb === 0
-              ? 'No outbound transfer — good for internal or low-traffic apps.'
-              : resources.bandwidthGb < 200
-              ? `${resources.bandwidthGb} GB — typical for a low-traffic website or API.`
-              : resources.bandwidthGb < 1000
-              ? `${resources.bandwidthGb} GB — moderate traffic; egress costs vary widely by provider.`
-              : `${resources.bandwidthGb} GB — high traffic; Cloudflare R2 has zero egress fees here.`
-          }
+          hint={bandwidthHint}
         />
         <PricingSlider
-          label="Databases"
-          sublabel="managed instances"
+          label={t('pricing.databases')}
+          sublabel={t('pricing.databasesSublabel')}
           value={resources.databaseInstances}
           min={0}
           max={10}
           unit="db"
           onChange={(v) => setResource('databaseInstances', v)}
-          hint={
-            resources.databaseInstances === 0
-              ? 'No managed databases — using a self-managed DB or none.'
-              : resources.databaseInstances === 1
-              ? '1 managed database — standard for most web apps.'
-              : `${resources.databaseInstances} instances — multi-service or microservices setup.`
-          }
+          hint={databasesHint}
         />
       </div>
 
@@ -160,7 +162,7 @@ export default function PricingEstimator() {
       <div className="bg-white dark:bg-slate-900 rounded-card border border-slate-200 dark:border-slate-700 p-6 shadow-card">
         <div className="flex items-center justify-between mb-5 gap-2">
           <h2 className="text-base font-semibold text-slate-900 dark:text-white">
-            Estimated monthly cost
+            {t('pricing.estimatedCost')}
           </h2>
           <div className="flex items-center gap-2 flex-shrink-0">
             {isLoading && <LoadingSpinner size="sm" />}
@@ -171,7 +173,7 @@ export default function PricingEstimator() {
                 className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 text-xs font-medium transition-colors"
               >
                 <Download className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Export CSV</span>
+                <span className="hidden sm:inline">{t('pricing.exportCSV')}</span>
               </button>
             )}
           </div>
@@ -187,7 +189,7 @@ export default function PricingEstimator() {
 
         {!error && !estimates && !isLoading && (
           <p className="text-sm text-slate-400 dark:text-slate-500">
-            Adjust the sliders to see estimated costs.
+            {t('pricing.adjustSliders')}
           </p>
         )}
       </div>

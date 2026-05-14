@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 const BRAND_COLORS = {
   aws:          '#FF9900',
@@ -18,13 +19,8 @@ const SERVERLESS_PROVIDERS = new Set(['vercel', 'netlify', 'cloudflare']);
 // AWS and Azure free tiers are trial-only (12 months), not permanent
 const TIME_LIMITED_FREE_TIER = new Set(['aws', 'azure']);
 
-const BANDWIDTH_NOTES = {
-  cloudflare: "Zero egress fees from R2 — no data transfer charges. A major cost advantage over AWS, GCP, and Azure.",
-};
-
-const TIER_NOTES = {
-  render: "Free tier web services spin down after 15 min of inactivity and cold-start on the next request.",
-};
+const BANDWIDTH_NOTE_PROVIDERS = new Set(['cloudflare']);
+const TIER_NOTE_PROVIDERS = new Set(['render']);
 
 function ChevronIcon({ open }) {
   return (
@@ -42,6 +38,8 @@ function ChevronIcon({ open }) {
 
 function ProviderRow({ est, isCheapest, maxCost, index }) {
   const [open, setOpen] = useState(false);
+  const { t } = useTranslation();
+
   const pct = (est.monthly_usd / maxCost) * 100;
   const color = BRAND_COLORS[est.provider] || '#6366f1';
   const isServerless = SERVERLESS_PROVIDERS.has(est.provider);
@@ -50,10 +48,10 @@ function ProviderRow({ est, isCheapest, maxCost, index }) {
   const serverlessNote = est.serverless_note || null;
   const databaseNote = est.database_note || null;
   const bandwidthCapNote = est.bandwidth_cap_note || null;
-  const bandwidthNote = BANDWIDTH_NOTES[est.provider];
-  const tierNote = TIER_NOTES[est.provider];
+  const hasBandwidthNote = BANDWIDTH_NOTE_PROVIDERS.has(est.provider);
+  const hasTierNote = TIER_NOTE_PROVIDERS.has(est.provider);
   const hasDetails =
-    isWithinFreeTier || serverlessNote || databaseNote || bandwidthCapNote || bandwidthNote || tierNote ||
+    isWithinFreeTier || serverlessNote || databaseNote || bandwidthCapNote || hasBandwidthNote || hasTierNote ||
     Object.values(est.breakdown).some((v) => v > 0);
 
   return (
@@ -62,7 +60,7 @@ function ProviderRow({ est, isCheapest, maxCost, index }) {
       <button
         onClick={() => hasDetails && setOpen((o) => !o)}
         aria-expanded={open}
-        aria-label={`${est.name} pricing details`}
+        aria-label={t('common.pricingDetails', { name: est.name })}
         className={`w-full text-left px-4 py-3 bg-white dark:bg-slate-900 transition-colors ${hasDetails ? 'hover:bg-slate-50 dark:hover:bg-slate-800/60 cursor-pointer' : 'cursor-default'}`}
       >
         <div className="flex items-center justify-between mb-2.5">
@@ -72,13 +70,13 @@ function ProviderRow({ est, isCheapest, maxCost, index }) {
             <span className="text-sm font-semibold text-slate-800 dark:text-slate-200 truncate">{est.name}</span>
             {isServerless && (
               <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300 flex-shrink-0 leading-tight whitespace-nowrap">
-                <span className="hidden sm:inline">Serverless · invocation based</span>
-                <span className="sm:hidden">Serverless</span>
+                <span className="hidden sm:inline">{t('pricingBreakdown.serverlessFull')}</span>
+                <span className="sm:hidden">{t('pricingBreakdown.serverlessShort')}</span>
               </span>
             )}
             {isCheapest && (
               <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 flex-shrink-0">
-                Best value
+                {t('pricingBreakdown.bestValue')}
               </span>
             )}
           </div>
@@ -87,7 +85,7 @@ function ProviderRow({ est, isCheapest, maxCost, index }) {
           <div className="flex items-center gap-2 flex-shrink-0 ml-3">
             <span className="text-sm font-bold text-slate-900 dark:text-white tabular-nums">
               ${est.monthly_usd.toFixed(2)}
-              <span className="text-xs font-normal text-slate-400 dark:text-slate-500 ml-1">/mo</span>
+              <span className="text-xs font-normal text-slate-400 dark:text-slate-500 ml-1">{t('pricingBreakdown.perMonth')}</span>
             </span>
             {hasDetails && <ChevronIcon open={open} />}
           </div>
@@ -140,8 +138,8 @@ function ProviderRow({ est, isCheapest, maxCost, index }) {
               <div className="space-y-1">
                 {isWithinFreeTier && (
                   <p className="text-xs text-emerald-600 dark:text-emerald-400 leading-relaxed">
-                    ✓ Current usage falls within the free tier.
-                    {hasTimeLimitedFree && ' Free tier is valid for the first 12 months only — standard rates apply after.'}
+                    {t('pricingBreakdown.freeTierNote')}
+                    {hasTimeLimitedFree && ' ' + t('pricingBreakdown.freeTier12Month')}
                   </p>
                 )}
                 {serverlessNote && (
@@ -156,17 +154,17 @@ function ProviderRow({ est, isCheapest, maxCost, index }) {
                 )}
                 {bandwidthCapNote && (
                   <p className="text-xs text-orange-600 dark:text-orange-400 leading-relaxed">
-                    ⚠ Bandwidth capped at $50/mo. {bandwidthCapNote}
+                    {t('pricingBreakdown.bandwidthCap')} {bandwidthCapNote}
                   </p>
                 )}
-                {bandwidthNote && (
+                {hasBandwidthNote && (
                   <p className="text-xs text-emerald-600 dark:text-emerald-400 leading-relaxed">
-                    ✦ {bandwidthNote}
+                    ✦ {t('pricingBreakdown.cloudflareBandwidth')}
                   </p>
                 )}
-                {tierNote && (
+                {hasTierNote && (
                   <p className="text-xs text-slate-400 dark:text-slate-500 leading-relaxed">
-                    ℹ {tierNote}
+                    ℹ {t('pricingBreakdown.renderTier')}
                   </p>
                 )}
               </div>
@@ -175,7 +173,7 @@ function ProviderRow({ est, isCheapest, maxCost, index }) {
                 to={`/providers/${est.provider}`}
                 className="inline-flex items-center gap-1 mt-2 text-xs font-medium text-primary-600 dark:text-primary-400 hover:underline"
               >
-                View {est.name} full profile →
+                {t('pricingBreakdown.viewProfile', { name: est.name })}
               </Link>
             </div>
           </motion.div>
@@ -186,6 +184,8 @@ function ProviderRow({ est, isCheapest, maxCost, index }) {
 }
 
 export default function PricingBreakdown({ estimates }) {
+  const { t } = useTranslation();
+
   if (!estimates || estimates.length === 0) return null;
 
   const sorted = estimates.slice().sort((a, b) => a.monthly_usd - b.monthly_usd);
@@ -205,7 +205,7 @@ export default function PricingBreakdown({ estimates }) {
       ))}
 
       <p className="text-xs text-slate-400 dark:text-slate-500 pt-3 border-t border-slate-100 dark:border-slate-800 italic leading-relaxed">
-        Estimates based on standard on-demand rates. Reserved instances, committed-use discounts, and volume pricing are not modelled. Always verify costs with official provider calculators.
+        {t('pricingBreakdown.disclaimer')}
       </p>
     </div>
   );

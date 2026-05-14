@@ -6,8 +6,8 @@ const { generateExplanation } = require('../services/openai');
 
 router.post('/', async (req, res) => {
   try {
-    const { useCase, profile, budget, priorities, geography, services } = req.body;
-    const userAnswers = { useCase, profile, budget, priorities: priorities || [], geography, services: services || [] };
+    const { useCase, profile, budget, priorities, geography, services, lang = 'en' } = req.body;
+    const userAnswers = { useCase, profile, budget, priorities: priorities || [], geography, services: services || [], lang };
 
     const ranked = providersData.providers
       .map((provider) => {

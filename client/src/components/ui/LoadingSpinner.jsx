@@ -1,6 +1,8 @@
+import { useTranslation } from 'react-i18next';
 import { cn } from '../../lib/utils';
 
 export default function LoadingSpinner({ size = 'md', className }) {
+  const { t } = useTranslation();
   const sizes = {
     sm: 'w-4 h-4 border-2',
     md: 'w-8 h-8 border-2',
@@ -15,7 +17,7 @@ export default function LoadingSpinner({ size = 'md', className }) {
         className
       )}
       role="status"
-      aria-label="Loading"
+      aria-label={t('common.loading')}
     />
   );
 }

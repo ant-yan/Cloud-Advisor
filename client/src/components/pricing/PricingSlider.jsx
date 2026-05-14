@@ -1,4 +1,7 @@
+import { useTranslation } from 'react-i18next';
+
 export default function PricingSlider({ label, sublabel, value, min, max, step = 1, unit, onChange, hint }) {
+  const { t } = useTranslation();
   const pct = ((value - min) / (max - min)) * 100;
 
   function clamp(v) {
@@ -34,7 +37,7 @@ export default function PricingSlider({ label, sublabel, value, min, max, step =
               onClick={() => onChange(clamp(value - step))}
               disabled={value <= min}
               className="px-2.5 h-8 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors text-base leading-none select-none"
-              aria-label={`Decrease ${label}`}
+              aria-label={`${t('common.decrease')} ${label}`}
             >
               −
             </button>
@@ -54,7 +57,7 @@ export default function PricingSlider({ label, sublabel, value, min, max, step =
               onClick={() => onChange(clamp(value + step))}
               disabled={value >= max}
               className="px-2.5 h-8 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors text-base leading-none select-none"
-              aria-label={`Increase ${label}`}
+              aria-label={`${t('common.increase')} ${label}`}
             >
               +
             </button>

@@ -1,22 +1,25 @@
 import { BookOpen, User, Rocket, Building2, Building } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import OptionCard from '../OptionCard';
 
-const options = [
-  { value: 'student', icon: BookOpen, label: 'Student / learning', description: 'Taking a course or building a portfolio project' },
-  { value: 'solo', icon: User, label: 'Solo developer', description: 'Indie hacker or freelancer' },
-  { value: 'startup', icon: Rocket, label: 'Startup', description: 'Early-stage team moving fast' },
-  { value: 'small-business', icon: Building2, label: 'Small business', description: 'Established company with a team' },
-  { value: 'enterprise', icon: Building, label: 'Enterprise', description: 'Large org with compliance needs' },
-];
-
 export default function Step2Profile({ value, onChange }) {
+  const { t } = useTranslation();
+
+  const options = [
+    { value: 'student',       icon: BookOpen,  label: t('wizard.step2.student'),      description: t('wizard.step2.studentDesc') },
+    { value: 'solo',          icon: User,      label: t('wizard.step2.solo'),         description: t('wizard.step2.soloDesc') },
+    { value: 'startup',       icon: Rocket,    label: t('wizard.step2.startup'),      description: t('wizard.step2.startupDesc') },
+    { value: 'small-business',icon: Building2, label: t('wizard.step2.smallBusiness'),description: t('wizard.step2.smallBusinessDesc') },
+    { value: 'enterprise',    icon: Building,  label: t('wizard.step2.enterprise'),   description: t('wizard.step2.enterpriseDesc') },
+  ];
+
   return (
     <div>
       <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white text-center mb-2">
-        Who are you?
+        {t('wizard.step2.title')}
       </h2>
       <p className="text-slate-500 dark:text-slate-400 text-center mb-8 text-sm sm:text-base">
-        This helps us calibrate ease-of-use and support recommendations.
+        {t('wizard.step2.subtitle')}
       </p>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {options.map((opt) => (
